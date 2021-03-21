@@ -5,7 +5,7 @@ import (
 	"fyne.io/fyne/v2/container"
 )
 
-func GetDashboardWindow() fyne.CanvasObject {
+func GetDashboardWindow(_ fyne.Window) fyne.CanvasObject {
 	content := container.NewAppTabs(DashboardItems...)
 	return content
 }

@@ -9,8 +9,8 @@ import (
 	"fyne.io/fyne/v2/container"
 )
 
-func GetContent() fyne.CanvasObject {
-	profile := profile.GetProfileWindow()
-	dashboard := dashboard.GetDashboardWindow()
+func GetContent(w fyne.Window) fyne.CanvasObject {
+	profile := profile.GetProfileWindow(w)
+	dashboard := dashboard.GetDashboardWindow(w)
 	return container.NewBorder(profile, nil, nil, nil, dashboard)
 }

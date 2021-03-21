@@ -9,8 +9,8 @@ import (
 
 func main() {
 	mainApp := app.New()
-	content := sections.GetContent()
 	window := mainApp.NewWindow("Git Monitor")
+	content := sections.GetContent(window)
 	window.SetContent(content)
 	window.Resize(fyne.NewSize(800, 600))
 	window.ShowAndRun()
