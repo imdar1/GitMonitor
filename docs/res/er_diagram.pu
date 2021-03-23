@@ -1,0 +1,35 @@
+@startuml er_diagram
+hide circle
+skinparam linetype ortho
+left to right direction
+entity "Project" as e1 {
+    **project_id: INT <<PK>>**
+    --
+    project_dir: VARCHAR
+}
+
+entity "Task" as e2 {
+    **task_id: INT <<PK>>**
+    --
+    **project_id: INT <<FK>>**
+    **branch_id: INT <<FK>>**
+    name: VARCHAR
+    assignee_name: VARCHAR
+    assignee_email: VARCHAR
+    task_status: INT
+    start_date: TIMESTAMP
+    end_date: TIMESTAMP
+}
+ 
+entity "Branch" as e3 {
+    **branch_id: INT<<PK>>**
+    --
+    **project_id: INT <<FK>>**
+    name: VARCHAR
+    is_default: INT(1)
+}
+
+e1 ||--|{ e3
+e1 ||--o{ e2
+e2 |o--o| e3
+@enduml
