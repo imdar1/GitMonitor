@@ -1,0 +1,13 @@
+@startuml sequence_diagram6
+actor User as user
+participant "Scheduler" as a1
+
+user -> a1: setPullPeriod
+activate a1
+
+a1 -> a1: activateScheduler
+activate a1
+deactivate a1
+
+a1 --> user
+@enduml

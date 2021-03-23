@@ -1,0 +1,18 @@
+@startuml sequence_diagram4
+actor User as user
+participant "TaskController" as a1
+database "Database" as db
+
+user -> a1: viewTimeline
+activate a1
+
+a1 -> db: getTask
+activate db
+
+db --> a1
+deactivate db
+
+a1 --> user
+deactivate a1
+
+@enduml

@@ -1,0 +1,22 @@
+@startuml sequence_diagram2
+participant "GitOperationsController" as a1
+actor User as user
+participant "BranchController" as a2
+database "Database" as db
+
+a1 -> user: branchList
+activate user
+
+user -> a2: setDefaultBranch
+activate a2
+
+a2 -> db: saveDefaultBranch
+activate db
+
+db-->a2
+deactivate db
+a2--> user
+deactivate a2
+deactivate user
+
+@enduml

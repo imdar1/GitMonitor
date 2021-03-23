@@ -1,0 +1,23 @@
+@startuml sequence_diagram3
+actor User as user
+participant "TaskController" as a1
+participant "BranchController" as a2
+database "Database" as db
+
+user -> a1: setProjectTasks
+activate a1
+
+a1 -> a2: setTaskBranch
+activate a2
+a2 -> db: getDefaultBranch
+activate db
+db --> a2
+a2 -> db: saveTask
+db --> a2
+deactivate db
+a2 --> a1
+deactivate a2
+a1 --> user
+deactivate a1
+
+@enduml

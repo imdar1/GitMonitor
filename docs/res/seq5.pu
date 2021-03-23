@@ -1,0 +1,27 @@
+@startuml sequence_diagram5
+actor User as user
+participant "GitOperationsController" as a1
+participant "TaskController" as a2
+database "Database" as db
+
+user -> a1: viewProjectInformation
+activate a1
+
+a1 -> a1: getProjectInformation
+activate a1
+
+a1 -> a2: getProjectTasks
+activate a2
+
+a2 -> db: getTasks
+activate db
+
+db --> a2
+a2 --> a1
+deactivate a2
+deactivate a1
+
+a1 --> user
+deactivate a1
+
+@enduml

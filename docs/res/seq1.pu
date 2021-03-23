@@ -1,0 +1,19 @@
+@startuml sequence_diagram1
+actor User as user
+participant "DirectoryExplorer" as a1
+
+user -> a1: setDirectory
+activate a1
+
+a1 -> a1: verifyDirectory
+activate a1
+deactivate a1
+
+alt valid directory
+    a1 --> user: Directory Accepted
+else invalid directory
+    a1 --> user: Invalid Git Directory
+end
+deactivate a1
+
+@enduml
