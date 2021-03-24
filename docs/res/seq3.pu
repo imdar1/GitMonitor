@@ -7,17 +7,27 @@ database "Database" as db
 user -> a1: setProjectTasks
 activate a1
 
+a1 -> a1: verifyBranch
+activate a1
 a1 -> a2: setTaskBranch
 activate a2
 a2 -> db: getDefaultBranch
 activate db
 db --> a2
-a2 -> db: saveTask
-db --> a2
 deactivate db
 a2 --> a1
 deactivate a2
-a1 --> user
+
+alt invalid branch
+    a1 --> user: Invalid branch
+    deactivate a1
+else valid branch
+    a1 -> db: saveTask
+    activate db
+    db --> a1
+    deactivate db
+    a1 --> user: Tasks saved successfully
+end
 deactivate a1
 
 @enduml
