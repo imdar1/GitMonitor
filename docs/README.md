@@ -3,6 +3,7 @@
 ## Software Requirements Docs
 ### Use case diagram
 ![Use Case Diagram](res/use_case.svg)
+
 There are 6 main use-cases with its corresponding sequence diagram
 - [Atur direktori proyek Git](#use-case-atur-direktori-proyek-git)
 - [Atur branch proyek Git](#use-case-atur-branch-proyek-git)
