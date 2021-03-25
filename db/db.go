@@ -9,7 +9,7 @@ import (
 
 type DBConfig struct {
 	Driver *sql.DB
-	Close  func() error
+	Close  func()
 }
 
 func InitDB() (DBConfig, error) {
@@ -38,8 +38,11 @@ func InitDB() (DBConfig, error) {
 
 	dbConfig := DBConfig{
 		Driver: db,
-		Close: func() error {
-			return db.Close()
+		Close: func() {
+			err := db.Close()
+			if err != nil {
+				panic(err)
+			}
 		},
 	}
 	return dbConfig, nil
