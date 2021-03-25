@@ -10,6 +10,7 @@ import (
 
 func main() {
 	db, err := db.InitDB()
+	defer db.Close()
 	if err != nil {
 		panic(err)
 	}
