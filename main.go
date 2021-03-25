@@ -1,6 +1,7 @@
 package main
 
 import (
+	"gitmonitor/db"
 	"gitmonitor/sections"
 
 	"fyne.io/fyne/v2"
@@ -8,9 +9,14 @@ import (
 )
 
 func main() {
+	db, err := db.InitDB()
+	if err != nil {
+		panic(err)
+	}
+
 	mainApp := app.New()
 	window := mainApp.NewWindow("Git Monitor")
-	content := sections.GetContent(window)
+	content := sections.GetContent(window, db)
 	window.SetContent(content)
 	window.Resize(fyne.NewSize(800, 600))
 	window.ShowAndRun()

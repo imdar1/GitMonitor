@@ -12,7 +12,7 @@ type DBConfig struct {
 	Close  func() error
 }
 
-func (d *DBConfig) InitDB() (DBConfig, error) {
+func InitDB() (DBConfig, error) {
 	db, err := sql.Open(constants.DB_DRIVER, constants.DB_PATH)
 	if err != nil {
 		return DBConfig{}, err
