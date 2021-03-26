@@ -1,4 +1,5 @@
 @startuml er_diagram
+skinparam monochrome true
 hide circle
 skinparam linetype ortho
 left to right direction

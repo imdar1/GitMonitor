@@ -1,4 +1,5 @@
 @startuml sequence_diagram4
+skinparam monochrome true
 actor User as user
 participant "TaskController" as a1
 database "Database" as db

@@ -1,4 +1,5 @@
 @startuml sequence_diagram1
+skinparam monochrome true
 actor User as user
 participant "DirectoryExplorer" as a1
 

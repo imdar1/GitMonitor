@@ -1,4 +1,5 @@
 @startuml use_case
+skinparam monochrome true
 left to right direction
 actor Pengguna as u
 rectangle "Essence Project" {

@@ -1,4 +1,5 @@
 @startuml sequence_diagram6
+skinparam monochrome true
 actor User as user
 participant "Scheduler" as a1
 

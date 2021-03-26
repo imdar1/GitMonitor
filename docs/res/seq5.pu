@@ -1,4 +1,5 @@
 @startuml sequence_diagram5
+skinparam monochrome true
 actor User as user
 participant "GitOperationsController" as a1
 participant "TaskController" as a2

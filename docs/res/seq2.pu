@@ -1,4 +1,5 @@
 @startuml sequence_diagram2
+skinparam monochrome true
 participant "GitOperationsController" as a1
 actor User as user
 participant "BranchController" as a2
