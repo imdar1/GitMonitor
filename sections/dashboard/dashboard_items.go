@@ -1,14 +1,29 @@
 package dashboard
 
 import (
+	"gitmonitor/sections/dashboard/contribution"
+	"gitmonitor/sections/dashboard/general"
+	"gitmonitor/sections/dashboard/task"
+
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/widget"
 )
 
-var (
-	DashboardItems = []*container.TabItem{
-		container.NewTabItem("General", widget.NewLabel("General Data")),
-		container.NewTabItem("Task", widget.NewLabel("Task Data")),
-		container.NewTabItem("Contribution", widget.NewLabel("Contribution Data")),
+type tabItems struct {
+	GeneralTab      *container.TabItem
+	TaskTab         *container.TabItem
+	ContributionTab *container.TabItem
+}
+
+func getTabItems() []*container.TabItem {
+	tabItems := tabItems{
+		GeneralTab:      container.NewTabItem("General", general.InitGeneralTab()),
+		TaskTab:         container.NewTabItem("Task", task.InitTaskTab()),
+		ContributionTab: container.NewTabItem("Contribution", contribution.InitContributionTab()),
 	}
-)
+	dashboardItems := []*container.TabItem{
+		tabItems.GeneralTab,
+		tabItems.TaskTab,
+		tabItems.ContributionTab,
+	}
+	return dashboardItems
+}
