@@ -1,9 +1,9 @@
 package sections
 
 import (
-	"gitmonitor/config"
 	"gitmonitor/db"
 	"gitmonitor/sections/dashboard"
+	"gitmonitor/services"
 
 	"gitmonitor/sections/profile"
 
@@ -12,7 +12,7 @@ import (
 )
 
 func GetContent(w fyne.Window, dbConfig db.DBConfig) fyne.CanvasObject {
-	gitConfig := config.GitConfig{}
+	gitConfig := services.GitConfig{}
 	profile := profile.GetProfileWindow(w, &gitConfig)
 	dashboard := dashboard.GetDashboardWindow(w, &gitConfig)
 	return container.NewBorder(profile, nil, nil, nil, dashboard)
