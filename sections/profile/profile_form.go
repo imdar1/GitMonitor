@@ -10,15 +10,16 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func GetProfileWindow(w fyne.Window, gitConfig *services.GitConfig) fyne.CanvasObject {
+func GetProfileWindow(w fyne.Window) fyne.CanvasObject {
 	title := widget.NewLabel("Select a Git repository below")
 	selectEntry := widget.NewSelectEntry([]string{"Dir A", "Dir B", "Dir C"})
 	selectEntry.PlaceHolder = "Type or select project directory"
 	loadButton := widget.NewButton("Load", func() {
-		_, err := services.InitGit(selectEntry.Text)
+		g, err := services.InitGit(selectEntry.Text)
 		if err != nil {
 			dialog.ShowError(err, w)
 		}
+		g.OnRepositoryLoaded()
 
 	})
 	loadButton.Disable()
