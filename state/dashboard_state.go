@@ -17,8 +17,6 @@ type TabItemsState struct {
 }
 
 func (tabState *TabItemsState) OnDatabaseLoaded() {
-	// tabState.GeneralTab.Content = widget.NewLabel("Database loaded")
-	// tabState.GeneralTab.Content.Refresh()
 	tabState.GeneralContent.Objects = nil
 	tabState.GeneralContent.Add(widget.NewLabel("Database loaded"))
 	tabState.GeneralContent.Refresh()
@@ -28,8 +26,6 @@ func (tabState *TabItemsState) OnRepositoryLoaded() {
 	tabState.GeneralContent.Objects = nil
 	tabState.GeneralContent.Add(widget.NewLabel("Repository loaded"))
 	tabState.GeneralContent.Refresh()
-	// tabState.GeneralTab.Content = widget.NewLabel("Repository loaded")
-	// tabState.GeneralTab.Content.Refresh()
 }
 
 func InitTabItems() TabItemsState {
