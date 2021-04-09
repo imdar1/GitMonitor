@@ -5,31 +5,38 @@ import (
 	"gitmonitor/sections/dashboard/general"
 	"gitmonitor/sections/dashboard/task"
 
+	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 )
 
 type TabItemsState struct {
-	GeneralTab      *container.TabItem
-	TaskTab         *container.TabItem
-	ContributionTab *container.TabItem
+	GeneralContent      *fyne.Container
+	TaskContent         *fyne.Container
+	ContributionContent *fyne.Container
 }
 
 func (tabState *TabItemsState) OnDatabaseLoaded() {
-	tabState.GeneralTab.Content = widget.NewLabel("Database loaded")
-	tabState.GeneralTab.Content.Refresh()
+	// tabState.GeneralTab.Content = widget.NewLabel("Database loaded")
+	// tabState.GeneralTab.Content.Refresh()
+	tabState.GeneralContent.Objects = nil
+	tabState.GeneralContent.Add(widget.NewLabel("Database loaded"))
+	tabState.GeneralContent.Refresh()
 }
 
 func (tabState *TabItemsState) OnRepositoryLoaded() {
-	tabState.GeneralTab.Content = widget.NewLabel("Repository loaded")
-	tabState.GeneralTab.Content.Refresh()
+	tabState.GeneralContent.Objects = nil
+	tabState.GeneralContent.Add(widget.NewLabel("Repository loaded"))
+	tabState.GeneralContent.Refresh()
+	// tabState.GeneralTab.Content = widget.NewLabel("Repository loaded")
+	// tabState.GeneralTab.Content.Refresh()
 }
 
 func InitTabItems() TabItemsState {
 	tabItems := TabItemsState{
-		GeneralTab:      container.NewTabItem("General", general.InitGeneralTab()),
-		TaskTab:         container.NewTabItem("Task", task.InitTaskTab()),
-		ContributionTab: container.NewTabItem("Contribution", contribution.InitContributionTab()),
+		GeneralContent:      container.NewVBox(general.InitGeneralTab()),
+		TaskContent:         container.NewVBox(task.InitTaskTab()),
+		ContributionContent: container.NewVBox(contribution.InitContributionTab()),
 	}
 	return tabItems
 }
