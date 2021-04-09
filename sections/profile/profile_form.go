@@ -2,6 +2,7 @@ package profile
 
 import (
 	"gitmonitor/services"
+	"gitmonitor/state"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -10,7 +11,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func GetProfileWindow(w fyne.Window) fyne.CanvasObject {
+func GetProfileWindow(w fyne.Window, appState *state.AppState) fyne.CanvasObject {
 	title := widget.NewLabel("Select a Git repository below")
 	selectEntry := widget.NewSelectEntry([]string{"Dir A", "Dir B", "Dir C"})
 	selectEntry.PlaceHolder = "Type or select project directory"
@@ -18,9 +19,10 @@ func GetProfileWindow(w fyne.Window) fyne.CanvasObject {
 		g, err := services.InitGit(selectEntry.Text)
 		if err != nil {
 			dialog.ShowError(err, w)
+			return
 		}
-		g.OnRepositoryLoaded()
-
+		appState.Repo = g
+		appState.OnRepositoryLoaded()
 	})
 	loadButton.Disable()
 	exploreButton := widget.NewButton("...", func() {
