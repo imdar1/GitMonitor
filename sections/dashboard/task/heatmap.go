@@ -10,11 +10,11 @@ import (
 )
 
 type heatmap struct {
-	colors    []string
-	days      []string
-	month     string
-	task      []string
-	taskCount int
+	colors        []string
+	days          []string
+	month         string
+	task          []string
+	assigneeCount int
 }
 
 func initData(db db.DBConfig) heatmap {
@@ -31,10 +31,13 @@ func initData(db db.DBConfig) heatmap {
 		month: month.String(),
 	}
 	return h
+
+	// TODO: using models.Task, extract all information
 }
 
 func (h *heatmap) timelineBase() *charts.HeatMap {
 	timeline := charts.NewHeatMap()
+	// TODO: get tas
 	timeline.SetGlobalOptions(
 		charts.WithTitleOpts(opts.Title{
 			Title: "Timeline for " + h.month,

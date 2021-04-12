@@ -1,6 +1,6 @@
 package models
 
 type Project struct {
-	ProjectId  int
+	ProjectId  int64
 	ProjectDir string
 }

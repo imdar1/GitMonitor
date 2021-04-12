@@ -5,11 +5,6 @@ import (
 	"gitmonitor/services"
 )
 
-type State interface {
-	OnDatabaseLoaded(db db.DBConfig)
-	OnRepositoryLoaded(repo services.GitConfig, db db.DBConfig)
-}
-
 type AppData struct {
 	Repo     services.GitConfig
 	Database *db.DBConfig
@@ -27,6 +22,6 @@ func (a *AppState) OnDatabaseLoaded() {
 }
 
 func (a *AppState) OnRepositoryLoaded() {
-	a.ProfileState.OnRepositoryLoaded(a.Repo, a.Database)
-	a.DashboardState.OnRepositoryLoaded(a.Repo, a.Database)
+	selectedProject := a.ProfileState.OnRepositoryLoaded(a.Database)
+	a.DashboardState.OnRepositoryLoaded(a.Repo, a.Database, selectedProject)
 }

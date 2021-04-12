@@ -2,6 +2,7 @@ package state
 
 import (
 	"gitmonitor/db"
+	"gitmonitor/models"
 	"gitmonitor/sections/dashboard/contribution"
 	"gitmonitor/sections/dashboard/general"
 	"gitmonitor/sections/dashboard/task"
@@ -9,7 +10,6 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/widget"
 )
 
 type TabItemsState struct {
@@ -22,10 +22,20 @@ func (tabState *TabItemsState) OnDatabaseLoaded(db *db.DBConfig) {
 
 }
 
-func (tabState *TabItemsState) OnRepositoryLoaded(repo services.GitConfig, db *db.DBConfig) {
+func (tabState *TabItemsState) OnRepositoryLoaded(repo services.GitConfig, db *db.DBConfig, project models.Project) {
 	tabState.GeneralContent.Objects = nil
-	tabState.GeneralContent.Add(widget.NewLabel("Repository loaded"))
+	tabState.TaskContent.Objects = nil
+
+	tasks := db.GetTasksData(project.ProjectId)
+	branches := db.GetBranchesData(project.ProjectId)
+
+	TaskData := task.TaskData{
+		Tasks:    tasks,
+		Branches: branches,
+	}
+	tabState.GeneralContent.Add(task.RenderTaskTab(TaskData))
 	tabState.GeneralContent.Refresh()
+
 }
 
 func InitTabItems() TabItemsState {

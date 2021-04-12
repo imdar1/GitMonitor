@@ -1,10 +1,8 @@
 package state
 
 import (
-	"fmt"
 	"gitmonitor/db"
 	"gitmonitor/models"
-	"gitmonitor/services"
 
 	"fyne.io/fyne/v2/widget"
 )
@@ -23,29 +21,17 @@ func getProjectName(p []models.Project) []string {
 }
 
 func (p *ProfileState) OnDatabaseLoaded(db *db.DBConfig) {
-	rows, err := db.Driver.Query("SELECT * FROM project")
-	services.CheckErr(err)
-	if rows != nil {
-		for rows.Next() {
-			var project models.Project
-			err = rows.Scan(&project.ProjectId, &project.ProjectDir)
-			services.CheckErr(err)
-			p.projects = append(p.projects, project)
-		}
-		rows.Close()
-
+	projectList := db.GetProjects()
+	if projectList != nil {
+		p.projects = projectList
 		projectName := getProjectName(p.projects)
 		p.ProjectEntry.SetOptions(projectName)
 	}
 }
 
-func (p *ProfileState) OnRepositoryLoaded(repo services.GitConfig, db *db.DBConfig) {
-	newDir := p.ProjectEntry.Text
-	insertQuery := fmt.Sprintf("INSERT INTO project(project_dir) VALUES('%s');", newDir)
-	statement, err := db.Driver.Prepare(insertQuery)
-	services.CheckErr(err)
-	_, err = statement.Exec()
-	services.CheckErr(err)
+func (p *ProfileState) OnRepositoryLoaded(db *db.DBConfig) models.Project {
+	project := db.GetProjectByDir(p.ProjectEntry.Text)
 	projectName := getProjectName(p.projects)
 	p.ProjectEntry.SetOptions(projectName)
+	return project
 }
