@@ -13,8 +13,9 @@ import (
 
 func GetProfileWindow(w fyne.Window, appState *state.AppState) fyne.CanvasObject {
 	title := widget.NewLabel("Select a Git repository below")
-	selectEntry := widget.NewSelectEntry([]string{"Dir A", "Dir B", "Dir C"})
+	selectEntry := widget.NewSelectEntry([]string{})
 	selectEntry.PlaceHolder = "Type or select project directory"
+	appState.ProfileState.ProjectEntry = selectEntry
 	loadButton := widget.NewButton("Load", func() {
 		g, err := services.InitGit(selectEntry.Text)
 		if err != nil {

@@ -11,7 +11,7 @@ import (
 	"fyne.io/fyne/v2/container"
 )
 
-func GetContent(w fyne.Window, dbConfig db.DBConfig) fyne.CanvasObject {
+func GetContent(w fyne.Window, dbConfig *db.DBConfig) fyne.CanvasObject {
 	appState := state.AppState{
 		AppData: state.AppData{
 			Database: dbConfig,
