@@ -9,13 +9,13 @@ import (
 	"gitmonitor/services"
 
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/widget"
 )
 
 type TabItemsState struct {
-	GeneralContent      *fyne.Container
-	TaskContent         *fyne.Container
-	ContributionContent *fyne.Container
+	GeneralContent      fyne.CanvasObject
+	TaskContent         fyne.CanvasObject
+	ContributionContent fyne.CanvasObject
 }
 
 func (tabState *TabItemsState) OnDatabaseLoaded(db *db.DBConfig) {
@@ -23,26 +23,26 @@ func (tabState *TabItemsState) OnDatabaseLoaded(db *db.DBConfig) {
 }
 
 func (tabState *TabItemsState) OnRepositoryLoaded(repo services.GitConfig, db *db.DBConfig, project models.Project) {
-	tabState.GeneralContent.Objects = nil
-	tabState.TaskContent.Objects = nil
+	taskContent := tabState.TaskContent.(*widget.Card)
 
 	tasks := db.GetTasksData(project.ProjectId)
 	branches := db.GetBranchesData(project.ProjectId)
 
-	TaskData := task.TaskData{
+	taskData := task.TaskData{
 		Tasks:    tasks,
 		Branches: branches,
 	}
-	tabState.GeneralContent.Add(task.RenderTaskTab(TaskData))
-	tabState.GeneralContent.Refresh()
+	taskContent.SetContent(task.RenderTaskTab(taskData))
+	taskContent.Refresh()
 
 }
 
 func InitTabItems() TabItemsState {
+
 	tabItems := TabItemsState{
-		GeneralContent:      container.NewVBox(general.InitGeneralTab()),
-		TaskContent:         container.NewVBox(task.InitTaskTab()),
-		ContributionContent: container.NewVBox(contribution.InitContributionTab()),
+		GeneralContent:      widget.NewCard("", "", general.InitGeneralTab()),
+		TaskContent:         widget.NewCard("", "", task.InitTaskTab()),
+		ContributionContent: widget.NewCard("", "", contribution.InitContributionTab()),
 	}
 	return tabItems
 }

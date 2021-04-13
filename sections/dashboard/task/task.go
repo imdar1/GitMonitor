@@ -4,6 +4,8 @@ import (
 	"gitmonitor/models"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -18,6 +20,18 @@ func InitTaskTab() fyne.CanvasObject {
 
 func RenderTaskTab(taskData TaskData) fyne.CanvasObject {
 	// TODO: call init heatmap
-	// TODO: Call generate heatmap function using task data, return new container
-	return widget.NewLabel("Dummy data")
+	heatMap := initData(taskData)
+	table := heatMap.getTable()
+
+	taskContentTop := container.NewVScroll(table)
+	taskContentBottom := container.NewHSplit(
+		widget.NewLabel("Daftar Task"),
+		widget.NewLabel("Infomasi Task"),
+	)
+	taskContent := container.NewVSplit(taskContentTop, taskContentBottom)
+	addTaskButton := widget.NewButton("Add Task", func() {})
+	setBranchButton := widget.NewButton("Set Branch", func() {})
+	actionButton := container.NewHBox(layout.NewSpacer(), addTaskButton, setBranchButton)
+	taskContentWrapper := container.NewBorder(nil, actionButton, nil, nil, taskContent)
+	return taskContentWrapper
 }

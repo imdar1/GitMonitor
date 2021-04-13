@@ -1,6 +1,7 @@
 package db
 
 import (
+	"database/sql"
 	"fmt"
 	"gitmonitor/models"
 	"gitmonitor/services"
@@ -23,12 +24,12 @@ func (db *DBConfig) GetProjects() []models.Project {
 }
 
 func (db *DBConfig) GetProjectByDir(dir string) models.Project {
-	query := fmt.Sprintf("SELECT * FROM project WHERE project_dir='%s' LIMIT 1;", dir)
-	rows, err := db.Driver.Query(query)
-	services.CheckErr(err)
-
 	var project models.Project
-	if rows == nil {
+
+	query := fmt.Sprintf("SELECT * FROM project WHERE project_dir='%s' LIMIT 1;", dir)
+	rows := db.Driver.QueryRow(query)
+	err := rows.Scan(&project.ProjectId, &project.ProjectDir)
+	if err == sql.ErrNoRows {
 		project = models.Project{
 			ProjectDir: dir,
 		}
@@ -36,9 +37,8 @@ func (db *DBConfig) GetProjectByDir(dir string) models.Project {
 		project.ProjectId = id
 		return project
 	}
-
-	err = rows.Scan(&project.ProjectId, &project.ProjectDir)
 	services.CheckErr(err)
+
 	return project
 }
 

@@ -26,6 +26,9 @@ func GetProfileWindow(w fyne.Window, appState *state.AppState) fyne.CanvasObject
 		appState.OnRepositoryLoaded()
 	})
 	loadButton.Disable()
+	selectEntry.OnChanged = func(_ string) {
+		loadButton.Enable()
+	}
 	exploreButton := widget.NewButton("...", func() {
 		dialog.ShowFolderOpen(
 			func(uri fyne.ListableURI, err error) {
