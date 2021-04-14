@@ -8,7 +8,7 @@ import (
 
 func (db *DBConfig) GetTasksData(projectId int64) []models.Task {
 	var tasks []models.Task
-	query := fmt.Sprintf("SELECT * FROM task WHERE project_id=%d;", projectId)
+	query := fmt.Sprintf("SELECT * FROM task WHERE project_id=%d ORDER BY start_date ASC;", projectId)
 	rows, err := db.Driver.Query(query)
 	services.CheckErr(err)
 

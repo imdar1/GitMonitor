@@ -15,6 +15,14 @@ func GetFirstAndLastDayOfMonth() (time.Time, time.Time) {
 	return firstOfMonth, lastOfMonth
 }
 
+func GetStringFromDatetime(t time.Time) string {
+	return t.Format("yyyymmdd")
+}
+
+func GetDayDifference(start time.Time, end time.Time) int {
+	return int(end.Sub(start).Hours() / 24)
+}
+
 func CheckErr(err error) {
 	if err != nil {
 		log.Printf("Error: %s", err.Error())

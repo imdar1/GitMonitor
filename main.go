@@ -6,6 +6,7 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/theme"
 )
 
 func main() {
@@ -16,6 +17,7 @@ func main() {
 	defer dbConfig.Close()
 
 	mainApp := app.New()
+	mainApp.Settings().SetTheme(theme.LightTheme())
 	window := mainApp.NewWindow("Git Monitor")
 	content := sections.GetContent(window, &dbConfig)
 	window.SetContent(content)

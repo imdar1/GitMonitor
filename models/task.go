@@ -10,6 +10,6 @@ type Task struct {
 	AssigneeName  string
 	AssigneeEmail string
 	TaskStatus    TaskStat
-	StartDate     int
-	EndDate       int
+	StartDate     int64
+	EndDate       int64
 }
