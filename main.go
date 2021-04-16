@@ -21,6 +21,6 @@ func main() {
 	window := mainApp.NewWindow("Git Monitor")
 	content := sections.GetContent(window, &dbConfig)
 	window.SetContent(content)
-	window.Resize(fyne.NewSize(1024, 720))
+	window.Resize(fyne.NewSize(800, 600))
 	window.ShowAndRun()
 }

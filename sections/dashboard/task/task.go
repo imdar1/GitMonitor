@@ -10,6 +10,7 @@ import (
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -20,6 +21,21 @@ type TaskData struct {
 
 func InitTaskTab() fyne.CanvasObject {
 	return widget.NewLabel("Task Information")
+}
+
+func getTaskObject(taskData TaskData) fyne.CanvasObject {
+	list := widget.NewList(
+		func() int {
+			return len(taskData.Tasks)
+		},
+		func() fyne.CanvasObject {
+			return container.NewHBox(widget.NewIcon(theme.DocumentIcon()), widget.NewLabel("Task Name"))
+		},
+		func(id widget.ListItemID, item fyne.CanvasObject) {
+			item.(*fyne.Container).Objects[1].(*widget.Label).SetText(taskData.Tasks[id].Name)
+		},
+	)
+	return list
 }
 
 func RenderTaskTab(taskData TaskData) fyne.CanvasObject {
@@ -40,9 +56,20 @@ func RenderTaskTab(taskData TaskData) fyne.CanvasObject {
 		ganttChartCanvas = ganttChartObj
 	}
 
+	tDummy := TaskData{
+		Tasks: []models.Task{
+			{
+				Name: "abc",
+			}, {
+				Name: "def",
+			}, {
+				Name: "ghi",
+			},
+		},
+	}
 	taskContentTop := container.NewVScroll(ganttChartCanvas)
 	taskContentBottom := container.NewHSplit(
-		widget.NewLabel("Daftar Task"),
+		getTaskObject(tDummy),
 		widget.NewLabel("Infomasi Task"),
 	)
 	taskContent := container.NewVSplit(taskContentTop, taskContentBottom)
