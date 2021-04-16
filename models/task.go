@@ -1,7 +1,5 @@
 package models
 
-type TaskStat int
-
 type Task struct {
 	TaskId        int
 	ProjectId     int
@@ -9,7 +7,7 @@ type Task struct {
 	Name          string
 	AssigneeName  string
 	AssigneeEmail string
-	TaskStatus    TaskStat
+	TaskStatus    int
 	StartDate     int64
 	EndDate       int64
 }

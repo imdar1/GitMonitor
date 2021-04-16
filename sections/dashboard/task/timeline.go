@@ -15,9 +15,8 @@ type taskInformation struct {
 }
 
 type timelineData struct {
-	startDateStr string
-	days         int
-	tasks        map[string]taskInformation
+	taskInformation
+	tasks map[string]taskInformation
 }
 
 func initData(taskData TaskData) timelineData {
@@ -29,8 +28,10 @@ func initData(taskData TaskData) timelineData {
 		endDate := time.Unix(taskData.Tasks[taskCount-1].EndDate, 0)
 
 		data = timelineData{
-			startDateStr: services.GetStringFromDatetime(startDate),
-			days:         services.GetDayDifference(startDate, endDate),
+			taskInformation: taskInformation{
+				startDateStr: services.GetStringFromDatetime(startDate),
+				days:         services.GetDayDifference(startDate, endDate),
+			},
 		}
 		for _, v := range taskData.Tasks {
 			startTask := time.Unix(v.StartDate, 0)
@@ -61,9 +62,11 @@ func initDummy() timelineData {
 		},
 	}
 	dummy := timelineData{
-		startDateStr: "20210401",
-		days:         30,
-		tasks:        tasks,
+		taskInformation: taskInformation{
+			startDateStr: "20210401",
+			days:         30,
+		},
+		tasks: tasks,
 	}
 	return dummy
 }

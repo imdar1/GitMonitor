@@ -2,9 +2,12 @@ package task
 
 import (
 	"bytes"
+	"gitmonitor/constants"
+	"gitmonitor/db"
 	"gitmonitor/models"
 	"gitmonitor/services"
 	"image"
+	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
@@ -23,7 +26,7 @@ func InitTaskTab() fyne.CanvasObject {
 	return widget.NewLabel("Task Information")
 }
 
-func getTaskObject(taskData TaskData) fyne.CanvasObject {
+func getTasksListCanvas(taskData TaskData, taskInfoCanvas fyne.CanvasObject, db *db.DBConfig) fyne.CanvasObject {
 	list := widget.NewList(
 		func() int {
 			return len(taskData.Tasks)
@@ -35,10 +38,48 @@ func getTaskObject(taskData TaskData) fyne.CanvasObject {
 			item.(*fyne.Container).Objects[1].(*widget.Label).SetText(taskData.Tasks[id].Name)
 		},
 	)
+
+	list.OnSelected = func(id widget.ListItemID) {
+		selectedTask := taskData.Tasks[id]
+		selectedBranch := db.GetBranchById(selectedTask.ProjectId)
+		taskDetail := taskInfoCanvas.(*container.Scroll)
+		taskDetail.Content = getTaskDetailCanvas(selectedTask, selectedBranch)
+		taskDetail.Refresh()
+	}
+	list.OnUnselected = func(id widget.ListItemID) {
+		taskDetail := taskInfoCanvas.(*container.Scroll)
+		taskDetail.Content = widget.NewLabel("Infomasi Task")
+		taskDetail.Refresh()
+	}
 	return list
 }
 
-func RenderTaskTab(taskData TaskData) fyne.CanvasObject {
+func getTaskDetailCanvas(selectedTask models.Task, selectedBranch models.Branch) fyne.CanvasObject {
+	startDate := time.Unix(selectedTask.StartDate, 0)
+	endDate := time.Unix(selectedTask.EndDate, 0)
+	taskNameLabel := widget.NewLabel(selectedTask.Name)
+	taskStartDateLabel := widget.NewLabel(startDate.Format("dd/mm/yyyy"))
+	taskEndDateLabel := widget.NewLabel(endDate.Format("dd/mm/yyyy"))
+	taskAssigneeNameLabel := widget.NewLabel(selectedTask.AssigneeName)
+	taskAssigneeEmailLabel := widget.NewLabel(selectedTask.AssigneeEmail)
+	taskBranchLabel := widget.NewLabel(selectedBranch.Name)
+	taskStatusLabel := widget.NewLabel(constants.TaskStatusMap[int(selectedTask.TaskStatus)])
+
+	form := &widget.Form{
+		Items: []*widget.FormItem{
+			{Text: "Name", Widget: taskNameLabel},
+			{Text: "Start date", Widget: taskStartDateLabel},
+			{Text: "End date", Widget: taskEndDateLabel},
+			{Text: "Assignee", Widget: taskAssigneeNameLabel},
+			{Text: "Assignee mail", Widget: taskAssigneeEmailLabel},
+			{Text: "Associated branch:", Widget: taskBranchLabel},
+			{Text: "Status", Widget: taskStatusLabel},
+		},
+	}
+	return form
+}
+
+func RenderTaskTab(taskData TaskData, db *db.DBConfig) fyne.CanvasObject {
 	// timeData := initData(taskData)
 	timeData := initDummy()
 	svgString := timeData.getGanttChartImage()
@@ -68,9 +109,10 @@ func RenderTaskTab(taskData TaskData) fyne.CanvasObject {
 		},
 	}
 	taskContentTop := container.NewVScroll(ganttChartCanvas)
+	taskDetail := container.NewVScroll(widget.NewLabel("Infomasi Task"))
 	taskContentBottom := container.NewHSplit(
-		getTaskObject(tDummy),
-		widget.NewLabel("Infomasi Task"),
+		getTasksListCanvas(tDummy, taskDetail, db),
+		taskDetail,
 	)
 	taskContent := container.NewVSplit(taskContentTop, taskContentBottom)
 	addTaskButton := widget.NewButton("Add Task", func() {})

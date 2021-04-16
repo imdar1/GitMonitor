@@ -28,3 +28,7 @@ func (db *DBConfig) GetBranchesData(projectId int64) []models.Branch {
 	}
 	return branches
 }
+
+func (db *DBConfig) GetBranchById(branchId int) models.Branch {
+	return models.Branch{}
+}

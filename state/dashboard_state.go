@@ -32,7 +32,7 @@ func (tabState *TabItemsState) OnRepositoryLoaded(repo services.GitConfig, db *d
 		Tasks:    tasks,
 		Branches: branches,
 	}
-	taskContent.SetContent(task.RenderTaskTab(taskData))
+	taskContent.SetContent(task.RenderTaskTab(taskData, db))
 	taskContent.Refresh()
 
 }

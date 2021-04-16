@@ -35,3 +35,11 @@ const INIT_TASK_TABLE = `CREATE TABLE IF NOT EXISTS task(
 			ON DELETE CASCADE 
 			ON UPDATE NO ACTION
 );`
+
+var (
+	TaskStatusMap = map[int]string{
+		0: "Waiting",
+		1: "In progress",
+		2: "Done",
+	}
+)
