@@ -22,6 +22,6 @@ func (a *AppState) OnDatabaseLoaded() {
 }
 
 func (a *AppState) OnRepositoryLoaded() {
-	selectedProject := a.ProfileState.OnRepositoryLoaded(a.Database)
-	a.DashboardState.OnRepositoryLoaded(a.Repo, a.Database, selectedProject)
+	selectedProject := a.ProfileState.OnRepositoryLoaded(a.AppData)
+	a.DashboardState.OnRepositoryLoaded(a.AppData, selectedProject)
 }

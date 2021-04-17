@@ -17,11 +17,6 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-type TaskData struct {
-	Tasks    []models.Task
-	Branches []models.Branch
-}
-
 func InitTaskTab() fyne.CanvasObject {
 	return widget.NewLabel("Task Information")
 }
@@ -116,7 +111,7 @@ func RenderTaskTab(taskData TaskData, db *db.DBConfig) fyne.CanvasObject {
 	)
 	taskContent := container.NewVSplit(taskContentTop, taskContentBottom)
 	addTaskButton := widget.NewButton("Add Task", func() {})
-	setBranchButton := widget.NewButton("Set Branch", func() {})
+	setBranchButton := widget.NewButton("Edit Task", func() {})
 	actionButton := container.NewHBox(layout.NewSpacer(), addTaskButton, setBranchButton)
 	taskContentWrapper := container.NewBorder(nil, actionButton, nil, nil, taskContent)
 	return taskContentWrapper

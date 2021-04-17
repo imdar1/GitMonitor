@@ -6,7 +6,6 @@ import (
 	"gitmonitor/sections/dashboard/contribution"
 	"gitmonitor/sections/dashboard/general"
 	"gitmonitor/sections/dashboard/task"
-	"gitmonitor/services"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/widget"
@@ -22,17 +21,14 @@ func (tabState *TabItemsState) OnDatabaseLoaded(db *db.DBConfig) {
 
 }
 
-func (tabState *TabItemsState) OnRepositoryLoaded(repo services.GitConfig, db *db.DBConfig, project models.Project) {
+func (tabState *TabItemsState) OnRepositoryLoaded(appData AppData, project models.Project) {
 	taskContent := tabState.TaskContent.(*widget.Card)
 
-	tasks := db.GetTasksData(project.ProjectId)
-	branches := db.GetBranchesData(project.ProjectId)
-
 	taskData := task.TaskData{
-		Tasks:    tasks,
-		Branches: branches,
+		Project: project,
 	}
-	taskContent.SetContent(task.RenderTaskTab(taskData, db))
+	taskData.ReadTaskData(*appData.Database)
+	taskContent.SetContent(task.RenderTaskTab(taskData, appData.Database))
 	taskContent.Refresh()
 
 }

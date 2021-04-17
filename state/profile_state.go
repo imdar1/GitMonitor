@@ -29,8 +29,8 @@ func (p *ProfileState) OnDatabaseLoaded(db *db.DBConfig) {
 	}
 }
 
-func (p *ProfileState) OnRepositoryLoaded(db *db.DBConfig) models.Project {
-	project := db.GetProjectByDir(p.ProjectEntry.Text)
+func (p *ProfileState) OnRepositoryLoaded(appData AppData) models.Project {
+	project := appData.Database.GetProjectByDir(p.ProjectEntry.Text)
 	projectName := getProjectName(p.projects)
 	p.ProjectEntry.SetOptions(projectName)
 	return project

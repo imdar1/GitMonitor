@@ -12,7 +12,7 @@ func (db *DBConfig) GetBranchesData(projectId int64) []models.Branch {
 	rows, err := db.Driver.Query(query)
 	services.CheckErr(err)
 
-	if rows != nil {
+	if err == nil {
 		for rows.Next() {
 			var branch models.Branch
 			err = rows.Scan(
@@ -30,5 +30,14 @@ func (db *DBConfig) GetBranchesData(projectId int64) []models.Branch {
 }
 
 func (db *DBConfig) GetBranchById(branchId int) models.Branch {
-	return models.Branch{}
+	var branch models.Branch
+	var isDefault int
+
+	query := fmt.Sprintf("SELECT * FROM branch WHERE branch_id='%d' LIMIT 1;", branchId)
+	rows := db.Driver.QueryRow(query)
+	err := rows.Scan(&branch.BranchId, &branch.ProjectId, &branch.Name, &isDefault)
+	branch.IsDefault = isDefault == 1
+	services.CheckErr(err)
+
+	return branch
 }
