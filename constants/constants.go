@@ -36,6 +36,14 @@ const INIT_TASK_TABLE = `CREATE TABLE IF NOT EXISTS task(
 			ON UPDATE NO ACTION
 );`
 
+type TaskStatus int
+
+const (
+	Waiting    TaskStatus = 0
+	InProgress TaskStatus = 1
+	Done       TaskStatus = 2
+)
+
 var (
 	TaskStatusMap = map[int]string{
 		0: "Waiting",

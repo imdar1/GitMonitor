@@ -41,3 +41,12 @@ func (db *DBConfig) GetBranchById(branchId int) models.Branch {
 
 	return branch
 }
+
+func (db *DBConfig) GetBranchIdByName(branchName string) int {
+	var branchId int
+	query := fmt.Sprintf("SELECT branch_id FROM branch WHERE branch_name='%s' LIMIT 1;", branchName)
+	rows := db.Driver.QueryRow(query)
+	err := rows.Scan(&branchId)
+	services.CheckErr(err)
+	return branchId
+}

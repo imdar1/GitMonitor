@@ -3,6 +3,10 @@ package services
 import (
 	"log"
 	"time"
+
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/data/binding"
+	"fyne.io/fyne/v2/widget"
 )
 
 func GetFirstAndLastDayOfMonth() (time.Time, time.Time) {
@@ -26,5 +30,22 @@ func GetDayDifference(start time.Time, end time.Time) int {
 func CheckErr(err error) {
 	if err != nil {
 		log.Printf("Error: %s", err.Error())
+	}
+}
+
+func CreateBoundItem(v binding.DataItem) fyne.CanvasObject {
+	switch val := v.(type) {
+	case binding.Bool:
+		return widget.NewCheckWithData("", val)
+	case binding.Float:
+		s := widget.NewSliderWithData(0, 1, val)
+		s.Step = 0.01
+		return s
+	case binding.Int:
+		return widget.NewEntryWithData(binding.IntToString(val))
+	case binding.String:
+		return widget.NewEntryWithData(val)
+	default:
+		return widget.NewLabel("")
 	}
 }

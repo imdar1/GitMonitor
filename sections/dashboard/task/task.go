@@ -75,8 +75,7 @@ func getTaskDetailCanvas(selectedTask models.Task, selectedBranch models.Branch)
 }
 
 func RenderTaskTab(taskData TaskData, db *db.DBConfig) fyne.CanvasObject {
-	// timeData := initData(taskData)
-	timeData := initDummy()
+	timeData := initData(taskData)
 	svgString := timeData.getGanttChartImage()
 
 	var ganttChartCanvas fyne.CanvasObject
@@ -92,25 +91,16 @@ func RenderTaskTab(taskData TaskData, db *db.DBConfig) fyne.CanvasObject {
 		ganttChartCanvas = ganttChartObj
 	}
 
-	tDummy := TaskData{
-		Tasks: []models.Task{
-			{
-				Name: "abc",
-			}, {
-				Name: "def",
-			}, {
-				Name: "ghi",
-			},
-		},
-	}
 	taskContentTop := container.NewVScroll(ganttChartCanvas)
 	taskDetail := container.NewVScroll(widget.NewLabel("Infomasi Task"))
 	taskContentBottom := container.NewHSplit(
-		getTasksListCanvas(tDummy, taskDetail, db),
+		getTasksListCanvas(taskData, taskDetail, db),
 		taskDetail,
 	)
 	taskContent := container.NewVSplit(taskContentTop, taskContentBottom)
-	addTaskButton := widget.NewButton("Add Task", func() {})
+	addTaskButton := widget.NewButton("Add Task", func() {
+		showTaskWindow(taskData, db)
+	})
 	setBranchButton := widget.NewButton("Edit Task", func() {})
 	actionButton := container.NewHBox(layout.NewSpacer(), addTaskButton, setBranchButton)
 	taskContentWrapper := container.NewBorder(nil, actionButton, nil, nil, taskContent)
