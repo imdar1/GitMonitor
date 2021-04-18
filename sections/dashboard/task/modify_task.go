@@ -100,6 +100,14 @@ func validateTask(task models.Task) bool {
 		task.Name != "" && task.ProjectId != 0
 }
 
+func showModifyTaskWindow(selectedTask models.Task, db *db.DBConfig) {
+	w := fyne.CurrentApp().NewWindow("Edit a task")
+	// TODO
+	w.CenterOnScreen()
+	w.Resize(fyne.NewSize(400, 300))
+	w.Show()
+}
+
 func showTaskWindow(taskData TaskData, db *db.DBConfig) {
 	w := fyne.CurrentApp().NewWindow("Add a new task")
 

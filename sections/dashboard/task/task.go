@@ -2,6 +2,7 @@ package task
 
 import (
 	"bytes"
+	"errors"
 	"gitmonitor/constants"
 	"gitmonitor/db"
 	"gitmonitor/models"
@@ -12,6 +13,8 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/data/binding"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -21,7 +24,12 @@ func InitTaskTab() fyne.CanvasObject {
 	return widget.NewLabel("Task Information")
 }
 
-func getTasksListCanvas(taskData TaskData, taskInfoCanvas fyne.CanvasObject, db *db.DBConfig) fyne.CanvasObject {
+func getTasksListCanvas(
+	taskData TaskData,
+	taskInfoCanvas fyne.CanvasObject,
+	db *db.DBConfig,
+	selectedTaskIndex binding.Int,
+) fyne.CanvasObject {
 	list := widget.NewList(
 		func() int {
 			return len(taskData.Tasks)
@@ -39,11 +47,13 @@ func getTasksListCanvas(taskData TaskData, taskInfoCanvas fyne.CanvasObject, db 
 		selectedBranch := db.GetBranchById(selectedTask.ProjectId)
 		taskDetail := taskInfoCanvas.(*container.Scroll)
 		taskDetail.Content = getTaskDetailCanvas(selectedTask, selectedBranch)
+		selectedTaskIndex.Set(id)
 		taskDetail.Refresh()
 	}
 	list.OnUnselected = func(id widget.ListItemID) {
 		taskDetail := taskInfoCanvas.(*container.Scroll)
 		taskDetail.Content = widget.NewLabel("Infomasi Task")
+		selectedTaskIndex.Set(-1)
 		taskDetail.Refresh()
 	}
 	return list
@@ -91,17 +101,30 @@ func RenderTaskTab(taskData TaskData, db *db.DBConfig) fyne.CanvasObject {
 		ganttChartCanvas = ganttChartObj
 	}
 
+	selectedTaskIndex := binding.NewInt()
+	selectedTaskIndex.Set(-1)
 	taskContentTop := container.NewVScroll(ganttChartCanvas)
 	taskDetail := container.NewVScroll(widget.NewLabel("Infomasi Task"))
 	taskContentBottom := container.NewHSplit(
-		getTasksListCanvas(taskData, taskDetail, db),
+		getTasksListCanvas(taskData, taskDetail, db, selectedTaskIndex),
 		taskDetail,
 	)
 	taskContent := container.NewVSplit(taskContentTop, taskContentBottom)
 	addTaskButton := widget.NewButton("Add Task", func() {
 		showTaskWindow(taskData, db)
 	})
-	setBranchButton := widget.NewButton("Edit Task", func() {})
+
+	setBranchButton := widget.NewButton("Edit Task", func() {
+		// get Task index from selected task
+		taskIndex, err := selectedTaskIndex.Get()
+		if err != nil || taskIndex == -1 {
+			dialog.ShowError(errors.New("please select a valid task"), fyne.CurrentApp().Driver().AllWindows()[0])
+			return
+		}
+
+		selectedTask := taskData.Tasks[taskIndex]
+		showModifyTaskWindow(selectedTask, db)
+	})
 	actionButton := container.NewHBox(layout.NewSpacer(), addTaskButton, setBranchButton)
 	taskContentWrapper := container.NewBorder(nil, actionButton, nil, nil, taskContent)
 	return taskContentWrapper
