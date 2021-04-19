@@ -3,14 +3,14 @@ package db
 import (
 	"fmt"
 	"gitmonitor/models"
-	"gitmonitor/services"
+	"gitmonitor/services/utils"
 )
 
 func (db *DBConfig) GetBranchesData(projectId int64) []models.Branch {
 	var branches []models.Branch
 	query := fmt.Sprintf("SELECT * FROM branch WHERE project_id=%d;", projectId)
 	rows, err := db.Driver.Query(query)
-	services.CheckErr(err)
+	utils.CheckErr(err)
 
 	if err == nil {
 		for rows.Next() {
@@ -21,7 +21,7 @@ func (db *DBConfig) GetBranchesData(projectId int64) []models.Branch {
 				&branch.Name,
 				&branch.IsDefault,
 			)
-			services.CheckErr(err)
+			utils.CheckErr(err)
 			branches = append(branches, branch)
 		}
 		rows.Close()
@@ -37,7 +37,7 @@ func (db *DBConfig) GetBranchById(branchId int) models.Branch {
 	rows := db.Driver.QueryRow(query)
 	err := rows.Scan(&branch.BranchId, &branch.ProjectId, &branch.Name, &isDefault)
 	branch.IsDefault = isDefault == 1
-	services.CheckErr(err)
+	utils.CheckErr(err)
 
 	return branch
 }
@@ -47,6 +47,6 @@ func (db *DBConfig) GetBranchIdByName(branchName string) int {
 	query := fmt.Sprintf("SELECT branch_id FROM branch WHERE branch_name='%s' LIMIT 1;", branchName)
 	rows := db.Driver.QueryRow(query)
 	err := rows.Scan(&branchId)
-	services.CheckErr(err)
+	utils.CheckErr(err)
 	return branchId
 }

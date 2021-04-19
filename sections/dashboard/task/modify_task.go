@@ -108,7 +108,7 @@ func showModifyTaskWindow(selectedTask models.Task, db *db.DBConfig) {
 	w.Show()
 }
 
-func showTaskWindow(taskData TaskData, db *db.DBConfig) {
+func showTaskWindow(taskWrapper fyne.CanvasObject, taskData TaskData, db *db.DBConfig) {
 	w := fyne.CurrentApp().NewWindow("Add a new task")
 
 	branches := db.GetBranchesData(taskData.Project.ProjectId)
@@ -151,7 +151,7 @@ func showTaskWindow(taskData TaskData, db *db.DBConfig) {
 			}
 
 			// Re-render task
-			RenderTaskTab(taskData, db)
+			RenderTaskTab(taskWrapper, taskData, db)
 
 			dialog.ShowInformation("Success", "Task was successfully added", w)
 			w.Close()

@@ -6,7 +6,7 @@ import (
 	"gitmonitor/constants"
 	"gitmonitor/db"
 	"gitmonitor/models"
-	"gitmonitor/services"
+	"gitmonitor/services/utils"
 	"image"
 	"time"
 
@@ -84,9 +84,11 @@ func getTaskDetailCanvas(selectedTask models.Task, selectedBranch models.Branch)
 	return form
 }
 
-func RenderTaskTab(taskData TaskData, db *db.DBConfig) fyne.CanvasObject {
+/* Render task to taskWrapper from given taskData and other operations needed to perform from db */
+func RenderTaskTab(taskWrapper fyne.CanvasObject, taskData TaskData, db *db.DBConfig) {
 	timeData := initData(taskData)
 	svgString := timeData.getGanttChartImage()
+	taskWrapperCard := taskWrapper.(*widget.Card)
 
 	var ganttChartCanvas fyne.CanvasObject
 	if len(svgString) == 0 {
@@ -94,7 +96,7 @@ func RenderTaskTab(taskData TaskData, db *db.DBConfig) fyne.CanvasObject {
 	} else {
 		byteImg := timeData.getGanttChartImage()
 		ganttChartImg, _, err := image.Decode(bytes.NewReader(byteImg))
-		services.CheckErr(err)
+		utils.CheckErr(err)
 
 		ganttChartObj := canvas.NewImageFromImage(ganttChartImg)
 		ganttChartObj.FillMode = canvas.ImageFillOriginal
@@ -111,7 +113,7 @@ func RenderTaskTab(taskData TaskData, db *db.DBConfig) fyne.CanvasObject {
 	)
 	taskContent := container.NewVSplit(taskContentTop, taskContentBottom)
 	addTaskButton := widget.NewButton("Add Task", func() {
-		showTaskWindow(taskData, db)
+		showTaskWindow(taskWrapperCard, taskData, db)
 	})
 
 	setBranchButton := widget.NewButton("Edit Task", func() {
@@ -127,5 +129,7 @@ func RenderTaskTab(taskData TaskData, db *db.DBConfig) fyne.CanvasObject {
 	})
 	actionButton := container.NewHBox(layout.NewSpacer(), addTaskButton, setBranchButton)
 	taskContentWrapper := container.NewBorder(nil, actionButton, nil, nil, taskContent)
-	return taskContentWrapper
+
+	taskWrapperCard.SetContent(taskContentWrapper)
+	taskWrapperCard.Refresh()
 }

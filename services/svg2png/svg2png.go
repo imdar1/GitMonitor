@@ -1,8 +1,9 @@
-package services
+package svg2png
 
 import (
 	"context"
 	"fmt"
+	"gitmonitor/services/utils"
 
 	"github.com/chromedp/cdproto/runtime"
 	"github.com/chromedp/chromedp"
@@ -40,7 +41,7 @@ func GetImage(svg string) []byte {
 	</html>`
 	html := fmt.Sprintf(htmlTemplate, svg)
 	err := chromedp.Run(ctx, elementScreenshot(html, `svg`, &buf))
-	CheckErr(err)
+	utils.CheckErr(err)
 
 	return buf
 }

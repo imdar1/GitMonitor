@@ -28,8 +28,7 @@ func (tabState *TabItemsState) OnRepositoryLoaded(appData AppData, project model
 		Project: project,
 	}
 	taskData.ReadTaskData(*appData.Database)
-	taskContent.SetContent(task.RenderTaskTab(taskData, appData.Database))
-	taskContent.Refresh()
+	task.RenderTaskTab(taskContent, taskData, appData.Database)
 
 }
 

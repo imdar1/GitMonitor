@@ -2,7 +2,8 @@ package task
 
 import (
 	"bytes"
-	"gitmonitor/services"
+	"gitmonitor/services/svg2png"
+	"gitmonitor/services/utils"
 	"time"
 
 	"github.com/gregoryv/draw/design"
@@ -29,16 +30,16 @@ func initData(taskData TaskData) timelineData {
 
 		data = timelineData{
 			taskInformation: taskInformation{
-				startDateStr: services.GetStringFromDatetime(startDate),
-				days:         services.GetDayDifference(startDate, endDate),
+				startDateStr: utils.GetStringFromDatetime(startDate),
+				days:         utils.GetDayDifference(startDate, endDate),
 			},
 		}
 		for _, v := range taskData.Tasks {
 			startTask := time.Unix(v.StartDate, 0)
 			endTask := time.Unix(v.EndDate, 0)
 			taskInfo := taskInformation{
-				startDateStr: services.GetStringFromDatetime(startTask),
-				days:         services.GetDayDifference(startTask, endTask),
+				startDateStr: utils.GetStringFromDatetime(startTask),
+				days:         utils.GetDayDifference(startTask, endTask),
 			}
 			data.tasks[v.Name] = taskInfo
 		}
@@ -88,35 +89,6 @@ func (t *timelineData) getGanttChartImage() []byte {
 	styling.SetOutput(imgBuffer)
 	ganttChart.WriteSVG(&styling)
 
-	imgByte := services.GetImage(imgBuffer.String())
+	imgByte := svg2png.GetImage(imgBuffer.String())
 	return imgByte
 }
-
-// func (h *heatmap) getTable() fyne.CanvasObject {
-// 	t := widget.NewTable(
-// 		func() (int, int) {
-// 			rows, cols := len(h.tasks)+1, len(h.days)+1
-// 			return rows, cols
-// 		},
-// 		func() fyne.CanvasObject {
-// 			rect := canvas.NewRectangle(color.White)
-// 			return container.NewMax(widget.NewLabel(""), rect)
-// 		},
-// 		func(id widget.TableCellID, cell fyne.CanvasObject) {
-// 			container := cell.(*fyne.Container)
-// 			label := container.Objects[0].(*widget.Label)
-// 			rect := container.Objects[1].(*canvas.Rectangle)
-// 			if id.Col == 0 || id.Row == 0 {
-// 				rect.FillColor = color.Transparent
-// 			}
-// 			if id.Col == 0 && id.Row >= 1 {
-// 				label.SetText(h.tasks[id.Row-1])
-// 			}
-// 			if id.Row == 0 && id.Col >= 1 {
-// 				label.SetText(h.days[id.Col-1])
-// 			}
-// 		},
-// 	)
-// 	t.SetColumnWidth(0, 102)
-// 	return t
-// }

@@ -4,18 +4,18 @@ import (
 	"database/sql"
 	"fmt"
 	"gitmonitor/models"
-	"gitmonitor/services"
+	"gitmonitor/services/utils"
 )
 
 func (db *DBConfig) GetProjects() []models.Project {
 	var projects []models.Project
 	rows, err := db.Driver.Query("SELECT * FROM project")
-	services.CheckErr(err)
+	utils.CheckErr(err)
 	if rows != nil {
 		for rows.Next() {
 			var project models.Project
 			err = rows.Scan(&project.ProjectId, &project.ProjectDir)
-			services.CheckErr(err)
+			utils.CheckErr(err)
 			projects = append(projects, project)
 		}
 		rows.Close()
@@ -37,7 +37,7 @@ func (db *DBConfig) GetProjectByDir(dir string) models.Project {
 		project.ProjectId = id
 		return project
 	}
-	services.CheckErr(err)
+	utils.CheckErr(err)
 
 	return project
 }
@@ -46,12 +46,12 @@ func (db *DBConfig) insertProject(p models.Project) int64 {
 	dir := p.ProjectDir
 	insertQuery := fmt.Sprintf("INSERT INTO project(project_dir) VALUES('%s');", dir)
 	statement, err := db.Driver.Prepare(insertQuery)
-	services.CheckErr(err)
+	utils.CheckErr(err)
 
 	result, err := statement.Exec()
-	services.CheckErr(err)
+	utils.CheckErr(err)
 
 	id, err := result.LastInsertId()
-	services.CheckErr(err)
+	utils.CheckErr(err)
 	return id
 }

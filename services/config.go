@@ -19,11 +19,3 @@ func InitGit(path string) (GitConfig, error) {
 	}
 	return g, err
 }
-
-func (g *GitConfig) OnRepositoryLoaded() {
-	// TODO: retrieve general information
-
-	// TODO: retrieve commit information (contributitors & commit)
-
-	// TODO: retrieve task data from DB
-}

@@ -3,14 +3,14 @@ package db
 import (
 	"fmt"
 	"gitmonitor/models"
-	"gitmonitor/services"
+	"gitmonitor/services/utils"
 )
 
 func (db *DBConfig) GetTasksData(projectId int64) []models.Task {
 	var tasks []models.Task
 	query := fmt.Sprintf("SELECT * FROM task WHERE project_id=%d ORDER BY start_date ASC;", projectId)
 	rows, err := db.Driver.Query(query)
-	services.CheckErr(err)
+	utils.CheckErr(err)
 
 	if rows != nil {
 		for rows.Next() {
@@ -26,7 +26,7 @@ func (db *DBConfig) GetTasksData(projectId int64) []models.Task {
 				&task.StartDate,
 				&task.EndDate,
 			)
-			services.CheckErr(err)
+			utils.CheckErr(err)
 			tasks = append(tasks, task)
 		}
 		rows.Close()
@@ -57,10 +57,10 @@ func (db *DBConfig) AddTask(task models.Task) error {
 		task.EndDate,
 	)
 	statement, err := db.Driver.Prepare(insertQuery)
-	services.CheckErr(err)
+	utils.CheckErr(err)
 
 	_, err = statement.Exec()
-	services.CheckErr(err)
+	utils.CheckErr(err)
 
 	return err
 }
