@@ -1,7 +1,7 @@
 package profile
 
 import (
-	"gitmonitor/services"
+	"gitmonitor/services/git"
 	"gitmonitor/state"
 
 	"fyne.io/fyne/v2"
@@ -17,7 +17,7 @@ func GetProfileWindow(w fyne.Window, appState *state.AppState) fyne.CanvasObject
 	selectEntry.PlaceHolder = "Type or select project directory"
 	appState.ProfileState.ProjectEntry = selectEntry
 	loadButton := widget.NewButton("Load", func() {
-		g, err := services.InitGit(selectEntry.Text)
+		g, err := git.InitGit(selectEntry.Text)
 		if err != nil {
 			dialog.ShowError(err, w)
 			return

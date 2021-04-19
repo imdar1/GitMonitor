@@ -2,11 +2,11 @@ package state
 
 import (
 	"gitmonitor/db"
-	"gitmonitor/services"
+	"gitmonitor/services/git"
 )
 
 type AppData struct {
-	Repo     services.GitConfig
+	Repo     git.GitConfig
 	Database *db.DBConfig
 }
 
