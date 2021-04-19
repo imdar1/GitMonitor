@@ -1,7 +1,6 @@
 package task
 
 import (
-	"fmt"
 	"gitmonitor/db"
 	"gitmonitor/models"
 	"gitmonitor/services/git"
@@ -64,13 +63,15 @@ func askAuth() transport.AuthMethod {
 
 func (t *TaskData) ReadTaskData(gitConfig git.GitConfig, db db.DBConfig) {
 	tasks := db.GetTasksData(t.Project.ProjectId)
-	branchDummy, err := gitConfig.GetRemoteBranches(askAuth)
-	// branchDummy := gitConfig.GetBranchList()
-	fmt.Println(branchDummy)
+
+	branches, err := gitConfig.GetRemoteBranches(askAuth)
 	utils.CheckErr(err)
 
-	branches := db.GetBranchesData(t.Project.ProjectId)
+	err = db.SyncBranches(branches)
+	utils.CheckErr(err)
+
+	branchModels := db.GetBranchesData(t.Project.ProjectId)
 
 	t.Tasks = tasks
-	t.Branches = branches
+	t.Branches = branchModels
 }

@@ -50,3 +50,7 @@ func (db *DBConfig) GetBranchIdByName(branchName string) int {
 	utils.CheckErr(err)
 	return branchId
 }
+
+func (db *DBConfig) SyncBranches(branches []string) error {
+	return nil
+}
