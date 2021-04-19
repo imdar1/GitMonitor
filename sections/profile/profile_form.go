@@ -32,7 +32,7 @@ func GetProfileWindow(w fyne.Window, appState *state.AppState) fyne.CanvasObject
 	exploreButton := widget.NewButton("...", func() {
 		dialog.ShowFolderOpen(
 			func(uri fyne.ListableURI, err error) {
-				if err == nil {
+				if err == nil && uri != nil {
 					selectEntry.SetText(uri.Path())
 					loadButton.Enable()
 				}
