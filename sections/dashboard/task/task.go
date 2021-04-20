@@ -25,8 +25,8 @@ func InitTaskTab() fyne.CanvasObject {
 }
 
 func getTasksListCanvas(
-	taskData TaskData,
 	taskInfoCanvas fyne.CanvasObject,
+	taskData TaskData,
 	db *db.DBConfig,
 	selectedTaskIndex binding.Int,
 ) fyne.CanvasObject {
@@ -45,8 +45,9 @@ func getTasksListCanvas(
 	list.OnSelected = func(id widget.ListItemID) {
 		selectedTask := taskData.Tasks[id]
 		selectedBranch := db.GetBranchById(taskData.Tasks[id].BranchId)
-		taskDetail := taskInfoCanvas.(*container.Scroll)
-		taskDetail.Content = getTaskDetailCanvas(selectedTask, selectedBranch)
+		taskDetail := taskInfoCanvas.(*fyne.Container)
+		taskDetail.Remove(taskDetail.Objects[0])
+		taskDetail.Add(container.NewVScroll(getTaskDetailCanvas(selectedTask, selectedBranch)))
 		selectedTaskIndex.Set(id)
 		taskDetail.Refresh()
 	}
@@ -63,8 +64,8 @@ func getTaskDetailCanvas(selectedTask models.Task, selectedBranch models.Branch)
 	startDate := time.Unix(selectedTask.StartDate, 0)
 	endDate := time.Unix(selectedTask.EndDate, 0)
 	taskNameLabel := widget.NewLabel(selectedTask.Name)
-	taskStartDateLabel := widget.NewLabel(startDate.Format("dd/mm/yyyy"))
-	taskEndDateLabel := widget.NewLabel(endDate.Format("dd/mm/yyyy"))
+	taskStartDateLabel := widget.NewLabel(startDate.Format("02/01/2006"))
+	taskEndDateLabel := widget.NewLabel(endDate.Format("02/01/2006"))
 	taskAssigneeNameLabel := widget.NewLabel(selectedTask.AssigneeName)
 	taskAssigneeEmailLabel := widget.NewLabel(selectedTask.AssigneeEmail)
 	taskBranchLabel := widget.NewLabel(selectedBranch.Name)
@@ -77,7 +78,7 @@ func getTaskDetailCanvas(selectedTask models.Task, selectedBranch models.Branch)
 			{Text: "End date", Widget: taskEndDateLabel},
 			{Text: "Assignee", Widget: taskAssigneeNameLabel},
 			{Text: "Assignee mail", Widget: taskAssigneeEmailLabel},
-			{Text: "Associated branch:", Widget: taskBranchLabel},
+			{Text: "Associated branch", Widget: taskBranchLabel},
 			{Text: "Status", Widget: taskStatusLabel},
 		},
 	}
@@ -106,9 +107,10 @@ func RenderTaskTab(taskWrapper fyne.CanvasObject, taskData TaskData, db *db.DBCo
 	selectedTaskIndex := binding.NewInt()
 	selectedTaskIndex.Set(-1)
 	taskContentTop := container.NewVScroll(ganttChartCanvas)
-	taskDetail := container.NewVScroll(widget.NewLabel("Infomasi Task"))
+
+	taskDetail := container.NewBorder(nil, nil, nil, nil, widget.NewLabel("Informasi task"))
 	taskContentBottom := container.NewHSplit(
-		getTasksListCanvas(taskData, taskDetail, db, selectedTaskIndex),
+		container.NewVScroll(getTasksListCanvas(taskDetail, taskData, db, selectedTaskIndex)),
 		taskDetail,
 	)
 	taskContent := container.NewVSplit(taskContentTop, taskContentBottom)

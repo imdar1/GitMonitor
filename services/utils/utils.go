@@ -25,7 +25,7 @@ func GetStringFromDatetime(t time.Time) string {
 }
 
 func GetDayDifference(start time.Time, end time.Time) int {
-	return int(end.Sub(start).Hours() / 24)
+	return int(end.Sub(start).Hours()/24) + 1
 }
 
 func CheckErr(err error) {

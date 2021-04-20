@@ -79,7 +79,7 @@ func (t *timelineData) getGanttChartImage() []byte {
 	}
 
 	var bar *design.Task
-	ganttChart := design.NewGanttChart(date.String(t.startDateStr), t.days)
+	ganttChart := design.NewGanttChart(date.String(t.startDateStr), t.days+1)
 	for key, value := range t.tasks {
 		bar = ganttChart.Add(key)
 		ganttChart.Place(bar).At(date.String(value.startDateStr), value.days)
