@@ -33,6 +33,7 @@ func initData(taskData TaskData) timelineData {
 				startDateStr: utils.GetStringFromDatetime(startDate),
 				days:         utils.GetDayDifference(startDate, endDate),
 			},
+			tasks: make(map[string]taskInformation),
 		}
 		for _, v := range taskData.Tasks {
 			startTask := time.Unix(v.StartDate, 0)

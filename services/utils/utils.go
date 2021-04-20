@@ -2,6 +2,7 @@ package utils
 
 import (
 	"log"
+	"sort"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -20,7 +21,7 @@ func GetFirstAndLastDayOfMonth() (time.Time, time.Time) {
 }
 
 func GetStringFromDatetime(t time.Time) string {
-	return t.Format("yyyymmdd")
+	return t.Format("20060102")
 }
 
 func GetDayDifference(start time.Time, end time.Time) int {
@@ -48,4 +49,16 @@ func CreateBoundItem(v binding.DataItem) fyne.CanvasObject {
 	default:
 		return widget.NewLabel("")
 	}
+}
+
+// Find element from a given array of string. Condition: list is already sorted
+func IsExist(element string, list []string) bool {
+	index := sort.Search(
+		len(list),
+		func(i int) bool {
+			// get list with the value >= element
+			return list[i] >= element
+		},
+	)
+	return index < len(list) && list[index] == element
 }

@@ -2,7 +2,7 @@ package models
 
 type Task struct {
 	TaskId        int
-	ProjectId     int
+	ProjectId     int64
 	BranchId      int
 	Name          string
 	AssigneeName  string

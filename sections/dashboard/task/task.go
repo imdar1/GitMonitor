@@ -44,7 +44,7 @@ func getTasksListCanvas(
 
 	list.OnSelected = func(id widget.ListItemID) {
 		selectedTask := taskData.Tasks[id]
-		selectedBranch := db.GetBranchById(selectedTask.ProjectId)
+		selectedBranch := db.GetBranchById(taskData.Tasks[id].BranchId)
 		taskDetail := taskInfoCanvas.(*container.Scroll)
 		taskDetail.Content = getTaskDetailCanvas(selectedTask, selectedBranch)
 		selectedTaskIndex.Set(id)

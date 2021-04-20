@@ -111,11 +111,10 @@ func showModifyTaskWindow(selectedTask models.Task, db *db.DBConfig) {
 func showTaskWindow(taskWrapper fyne.CanvasObject, taskData TaskData, db *db.DBConfig) {
 	w := fyne.CurrentApp().NewWindow("Add a new task")
 
-	branches := db.GetBranchesData(taskData.Project.ProjectId)
 	data := &formData{
 		projectId: taskData.Project.ProjectId,
 		task:      models.Task{},
-		branches:  branches,
+		branches:  taskData.Branches,
 	}
 	taskForm := getTaskForm(
 		data,
@@ -137,6 +136,7 @@ func showTaskWindow(taskWrapper fyne.CanvasObject, taskData TaskData, db *db.DBC
 			// Get branch id for selected branch
 			data.task.BranchId = db.GetBranchIdByName(data.tempBranch)
 			data.task.TaskStatus = int(constants.Waiting)
+			data.task.ProjectId = taskData.Project.ProjectId
 
 			isValid := validateTask(data.task)
 			if !isValid {

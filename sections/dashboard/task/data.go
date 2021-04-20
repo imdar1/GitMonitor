@@ -66,11 +66,11 @@ func (t *TaskData) ReadTaskData(gitConfig git.GitConfig, db db.DBConfig) {
 
 	branches, err := gitConfig.GetRemoteBranches(askAuth)
 	utils.CheckErr(err)
-
-	err = db.SyncBranches(branches)
+	err = db.SyncBranches(t.Project.ProjectId, branches)
 	utils.CheckErr(err)
 
-	branchModels := db.GetBranchesData(t.Project.ProjectId)
+	branchModels, err := db.GetBranchesData(t.Project.ProjectId)
+	utils.CheckErr(err)
 
 	t.Tasks = tasks
 	t.Branches = branchModels
