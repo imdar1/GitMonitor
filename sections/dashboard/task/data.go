@@ -62,15 +62,25 @@ func askAuth() transport.AuthMethod {
 }
 
 func (t *TaskData) ReadTaskData(gitConfig git.GitConfig, db db.DBConfig) {
+	// Initialize tasks list
 	tasks := db.GetTasksData(t.Project.ProjectId)
 
+	// get remote branches and sync branches with db
 	branches, err := gitConfig.GetRemoteBranches(askAuth)
 	utils.CheckErr(err)
 	err = db.SyncBranches(t.Project.ProjectId, branches)
 	utils.CheckErr(err)
 
+	// get branches stored in db
 	branchModels, err := db.GetBranchesData(t.Project.ProjectId)
 	utils.CheckErr(err)
+
+	// sync task and branch in db
+	err = db.SyncTask(tasks, branchModels)
+	utils.CheckErr(err)
+
+	// get updated tasks
+	tasks = db.GetTasksData(t.Project.ProjectId)
 
 	t.Tasks = tasks
 	t.Branches = branchModels

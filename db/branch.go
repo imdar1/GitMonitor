@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"gitmonitor/models"
 	"gitmonitor/services/utils"
-	"sort"
 )
 
 func (db *DBConfig) GetBranchesData(projectId int64) ([]models.Branch, error) {
@@ -63,8 +62,6 @@ func getBranchesName(branches []models.Branch) []string {
 }
 
 func (db *DBConfig) SyncBranches(projectId int64, branches []string) error {
-	sort.Strings(branches)
-
 	branchesModel, err := db.GetBranchesData(projectId)
 	if err != nil {
 		return err
@@ -76,7 +73,7 @@ func (db *DBConfig) SyncBranches(projectId int64, branches []string) error {
 		return err
 	}
 	for _, v := range branchesModel {
-		isExist := utils.IsExist(v.Name, branches)
+		isExist := utils.IsExistStr(v.Name, branches)
 		if !isExist {
 			deleteQuery := fmt.Sprintf("DELETE FROM branch WHERE name='%s';", v.Name)
 			_, err := delTx.Exec(deleteQuery)
@@ -92,6 +89,7 @@ func (db *DBConfig) SyncBranches(projectId int64, branches []string) error {
 	}
 
 	branchesModelList := getBranchesName(branchesModel)
+
 	isDefault := 0
 	insTx, err := db.Driver.Begin()
 	if err != nil {
@@ -99,7 +97,7 @@ func (db *DBConfig) SyncBranches(projectId int64, branches []string) error {
 	}
 	for _, v := range branches {
 		// insert if not exist
-		isExist := utils.IsExist(v, branchesModelList)
+		isExist := utils.IsExistStr(v, branchesModelList)
 		if !isExist {
 			insertQuery := fmt.Sprintf(
 				"INSERT INTO branch(project_id, name, is_default) VALUES(%d, '%s', %d); ",
@@ -115,10 +113,5 @@ func (db *DBConfig) SyncBranches(projectId int64, branches []string) error {
 			}
 		}
 	}
-	err = insTx.Commit()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return insTx.Commit()
 }

@@ -48,6 +48,6 @@ var (
 	TaskStatusMap = map[int]string{
 		0: "Waiting",
 		1: "In progress",
-		2: "Done",
+		2: "Done (Associated branch already deleted)",
 	}
 )

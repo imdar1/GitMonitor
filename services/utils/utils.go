@@ -2,7 +2,6 @@ package utils
 
 import (
 	"log"
-	"sort"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -52,13 +51,21 @@ func CreateBoundItem(v binding.DataItem) fyne.CanvasObject {
 }
 
 // Find element from a given array of string. Condition: list is already sorted
-func IsExist(element string, list []string) bool {
-	index := sort.Search(
-		len(list),
-		func(i int) bool {
-			// get list with the value >= element
-			return list[i] >= element
-		},
-	)
-	return index < len(list) && list[index] == element
+func IsExistStr(element string, list []string) bool {
+	for _, v := range list {
+		if element == v {
+			return true
+		}
+	}
+	return false
+}
+
+func IsExistInt(element int, list []int) bool {
+	for _, v := range list {
+		if element == v {
+			return true
+		}
+	}
+
+	return false
 }
