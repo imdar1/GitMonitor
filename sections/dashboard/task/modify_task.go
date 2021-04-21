@@ -163,6 +163,6 @@ func showTaskWindow(taskWrapper fyne.CanvasObject, taskData TaskData, db *db.DBC
 	wrapper := widget.NewCard("", "", taskForm)
 	w.SetContent(wrapper)
 	w.CenterOnScreen()
-	w.Resize(fyne.NewSize(00, 300))
+	w.Resize(fyne.NewSize(600, 300))
 	w.Show()
 }

@@ -54,6 +54,7 @@ func askAuth() transport.AuthMethod {
 		authMethod.Password = password
 		close(done)
 	})
+	w.Resize(fyne.NewSize(400, w.Content().Size().Height))
 	w.CenterOnScreen()
 	w.Show()
 

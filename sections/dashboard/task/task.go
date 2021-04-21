@@ -47,7 +47,7 @@ func getTasksListCanvas(
 		selectedBranch := db.GetBranchById(taskData.Tasks[id].BranchId)
 		taskDetail := taskInfoCanvas.(*fyne.Container)
 		taskDetail.Remove(taskDetail.Objects[0])
-		taskDetail.Add(container.NewVScroll(getTaskDetailCanvas(selectedTask, selectedBranch)))
+		taskDetail.Add(container.NewScroll(getTaskDetailCanvas(selectedTask, selectedBranch)))
 		selectedTaskIndex.Set(id)
 		taskDetail.Refresh()
 	}
