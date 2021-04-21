@@ -96,7 +96,7 @@ func getTaskForm(data *formData, onSubmit func(), onClose func()) fyne.CanvasObj
 
 func validateTask(task models.Task) bool {
 	return task.AssigneeEmail != "" && task.AssigneeName != "" &&
-		task.BranchId != 0 && task.EndDate != 0 && task.StartDate != 0 &&
+		task.EndDate != 0 && task.StartDate != 0 &&
 		task.Name != "" && task.ProjectId != 0
 }
 
@@ -163,6 +163,6 @@ func showTaskWindow(taskWrapper fyne.CanvasObject, taskData TaskData, db *db.DBC
 	wrapper := widget.NewCard("", "", taskForm)
 	w.SetContent(wrapper)
 	w.CenterOnScreen()
-	w.Resize(fyne.NewSize(600, 300))
+	w.Resize(fyne.NewSize(00, 300))
 	w.Show()
 }
