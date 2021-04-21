@@ -51,3 +51,5 @@ var (
 		2: "Done (Associated branch already deleted)",
 	}
 )
+
+const Separator = "^_^"

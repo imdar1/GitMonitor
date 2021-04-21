@@ -1,7 +1,6 @@
 package git
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/go-git/go-git/v5"
@@ -38,7 +37,6 @@ func (r *GitConfig) GetRemoteBranches(askAuth func() transport.AuthMethod) ([]st
 		if err == transport.ErrAuthenticationRequired {
 			// need authentication, ask user for auth method
 			authMethod := askAuth()
-			fmt.Println(authMethod)
 			refs, err = rem.List(&git.ListOptions{
 				Auth: authMethod,
 			})

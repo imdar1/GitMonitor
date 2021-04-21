@@ -22,14 +22,18 @@ func (tabState *TabItemsState) OnDatabaseLoaded(db *db.DBConfig) {
 }
 
 func (tabState *TabItemsState) OnRepositoryLoaded(appData AppData, project models.Project) {
+	// Update task content
 	taskContent := tabState.TaskContent.(*widget.Card)
-
 	taskData := task.TaskData{
 		Project: project,
 	}
 	taskData.ReadTaskData(appData.Repo, *appData.Database)
 	task.RenderTaskTab(taskContent, taskData, appData.Database)
 
+	// Update general content
+	generalContent := tabState.GeneralContent.(*widget.Card)
+	generalData := general.InitGeneralData(project, appData.Repo)
+	general.RenderGeneralTab(generalContent, generalData)
 }
 
 func InitTabItems() TabItemsState {
