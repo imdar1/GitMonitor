@@ -48,31 +48,6 @@ func initData(taskData TaskData) timelineData {
 	return data
 }
 
-func initDummy() timelineData {
-	tasks := map[string]taskInformation{
-		"abc": {
-			startDateStr: "20210401",
-			days:         10,
-		},
-		"def": {
-			startDateStr: "20210411",
-			days:         5,
-		},
-		"ghi": {
-			startDateStr: "20210413",
-			days:         8,
-		},
-	}
-	dummy := timelineData{
-		taskInformation: taskInformation{
-			startDateStr: "20210401",
-			days:         30,
-		},
-		tasks: tasks,
-	}
-	return dummy
-}
-
 func (t *timelineData) getGanttChartImage() []byte {
 	if len(t.tasks) == 0 {
 		return []byte{}
