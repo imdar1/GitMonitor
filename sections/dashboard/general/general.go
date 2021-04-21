@@ -45,7 +45,18 @@ func RenderGeneralTab(wrapper fyne.CanvasObject, data GeneralData) {
 	}
 
 	projectInfoWrapper := widget.NewCard("Project Information", "", form)
+	weeklyChartWrapper := widget.NewCard(
+		"Weekly Chart",
+		"Last activities in the last 10 weeks. Week-10 is the current week.",
+		getWeeklyChartCanvas(data.Commits),
+	)
+	monthlyChartWrapper := widget.NewCard(
+		"Monthly Chart",
+		"Total number of commits every day this month.",
+		getMonthlyChartCanvas(data.Commits),
+	)
+	vBox := container.NewVBox(projectInfoWrapper, weeklyChartWrapper, monthlyChartWrapper)
 
 	generalWrapper := wrapper.(*widget.Card)
-	generalWrapper.SetContent(container.NewVScroll(projectInfoWrapper))
+	generalWrapper.SetContent(container.NewVScroll(vBox))
 }

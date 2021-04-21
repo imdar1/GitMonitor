@@ -50,6 +50,12 @@ func CreateBoundItem(v binding.DataItem) fyne.CanvasObject {
 	}
 }
 
+func BeginningOfMonth() time.Time {
+	now := time.Now()
+	y, m, _ := now.Date()
+	return time.Date(y, m, 1, 0, 0, 0, 0, now.Location())
+}
+
 // Find element from a given array of string. Condition: list is already sorted
 func IsExistStr(element string, list []string) bool {
 	for _, v := range list {
@@ -68,4 +74,12 @@ func IsExistInt(element int, list []int) bool {
 	}
 
 	return false
+}
+
+func Reverse(input []int) []int {
+	a := input
+	for i, j := 0, len(a)-1; i < j; i, j = i+1, j-1 {
+		a[i], a[j] = a[j], a[i]
+	}
+	return a
 }

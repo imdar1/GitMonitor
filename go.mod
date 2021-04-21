@@ -18,6 +18,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.6
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/stretchr/testify v1.7.0 // indirect
+	github.com/wcharczuk/go-chart/v2 v2.1.0
 	golang.org/x/image v0.0.0-20210220032944-ac19c3e999fb // indirect
 	golang.org/x/net v0.0.0-20210410081132-afb366fc7cd1 // indirect
 	golang.org/x/sys v0.0.0-20210414055047-fe65e336abe0 // indirect
