@@ -3,8 +3,6 @@ package git
 import (
 	"fmt"
 	"gitmonitor/constants"
-	"io"
-	"time"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
@@ -31,27 +29,6 @@ func (r *GitConfig) GetOriginUrl() string {
 		return ""
 	}
 	return origin.Config().URLs[0]
-}
-
-func (r *GitConfig) GetRepoStartDate() (time.Time, error) {
-	cIter, err := r.repo.Log(&git.LogOptions{Order: git.LogOrderCommitterTime})
-	if err != nil {
-		return time.Time{}, err
-	}
-
-	var lastCommit (*object.Commit)
-	for {
-		c, err := cIter.Next()
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			return time.Time{}, err
-		}
-		lastCommit = c
-	}
-
-	return lastCommit.Author.When, nil
 }
 
 func (r *GitConfig) GetPaths() ([]string, error) {

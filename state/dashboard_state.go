@@ -37,7 +37,7 @@ func (tabState *TabItemsState) OnRepositoryLoaded(appData AppData, project model
 
 	// Update contributor content
 	contributionContent := tabState.ContributionContent.(*widget.Card)
-	contributionData := contribution.InitContributorData(appData.Repo)
+	contributionData := contribution.InitContributorData(generalData.Commits, appData.Repo)
 	contribution.RenderContributorTab(contributionContent, contributionData)
 }
 

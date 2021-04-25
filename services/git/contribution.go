@@ -3,7 +3,6 @@ package git
 import (
 	"time"
 
-	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
@@ -20,21 +19,16 @@ type AuthorInfo struct {
 	FirstCommit   time.Time
 }
 
-func (r *GitConfig) GetAuthorInfoByAuthor() (map[Author]AuthorInfo, error) {
-	cIter, err := r.repo.Log(&git.LogOptions{Order: git.LogOrderCommitterTime})
-	if err != nil {
-		return nil, err
-	}
-
+func (r *GitConfig) GetAuthorInfoByAuthor(commits []*object.Commit) (map[Author]AuthorInfo, error) {
 	authorInfoMap := make(map[Author]AuthorInfo)
-	err = cIter.ForEach(func(c *object.Commit) error {
+	for _, c := range commits {
 		currAuthor := Author{
 			Name:  c.Author.Name,
 			Email: c.Author.Email,
 		}
 		stats, err := c.Stats()
 		if err != nil {
-			return err
+			return authorInfoMap, err
 		}
 
 		currAddition := 0
@@ -60,8 +54,6 @@ func (r *GitConfig) GetAuthorInfoByAuthor() (map[Author]AuthorInfo, error) {
 			}
 			authorInfoMap[currAuthor] = authorInfo
 		}
-
-		return nil
-	})
-	return authorInfoMap, err
+	}
+	return authorInfoMap, nil
 }
