@@ -34,6 +34,11 @@ func (tabState *TabItemsState) OnRepositoryLoaded(appData AppData, project model
 	generalContent := tabState.GeneralContent.(*widget.Card)
 	generalData := general.InitGeneralData(project, appData.Repo)
 	general.RenderGeneralTab(generalContent, generalData)
+
+	// Update contributor content
+	contributionContent := tabState.ContributionContent.(*widget.Card)
+	contributionData := contribution.InitContributorData(appData.Repo)
+	contribution.RenderContributorTab(contributionContent, contributionData)
 }
 
 func InitTabItems() TabItemsState {
