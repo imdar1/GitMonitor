@@ -39,7 +39,7 @@ func (r *GitConfig) GetAuthorInfoByAuthor(commits []*object.Commit) (map[Author]
 		}
 
 		if authorInfo, ok := authorInfoMap[currAuthor]; ok {
-			authorInfo.LastCommit = c.Author.When
+			authorInfo.FirstCommit = c.Author.When
 			authorInfo.TotalCommit++
 			authorInfo.TotalAddLines += currAddition
 			authorInfo.TotalDelLines += currDeletion
