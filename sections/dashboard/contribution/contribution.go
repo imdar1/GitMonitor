@@ -23,12 +23,12 @@ func RenderContributorTab(wrapper fyne.CanvasObject, data ContributorData) {
 		authorList = append(authorList, authorTable{key, value})
 	}
 
-	minLabelWidth := []float32{0, 0, 0, 0, 0, 0, 0}
+	minLabelWidth := []float32{0, 0, 0, 0, 0}
 
 	var table *widget.Table
 	table = widget.NewTable(
 		func() (int, int) {
-			return len(data.authorMap), 7
+			return len(data.authorMap), 5
 		},
 		func() fyne.CanvasObject {
 			return widget.NewLabel(" ")
@@ -46,12 +46,8 @@ func RenderContributorTab(wrapper fyne.CanvasObject, data ContributorData) {
 				case 2:
 					label.SetText("Commits")
 				case 3:
-					label.SetText("Added lines")
-				case 4:
-					label.SetText("Deleted lines")
-				case 5:
 					label.SetText("First commit")
-				case 6:
+				case 4:
 					label.SetText("Last commit")
 				default:
 					label.SetText(" ")
@@ -66,12 +62,8 @@ func RenderContributorTab(wrapper fyne.CanvasObject, data ContributorData) {
 				case 2:
 					label.SetText(fmt.Sprintf("%d", authorList[id.Row-1].TotalCommit))
 				case 3:
-					label.SetText(fmt.Sprintf("%d", authorList[id.Row-1].TotalAddLines))
-				case 4:
-					label.SetText(fmt.Sprintf("%d", authorList[id.Row-1].TotalDelLines))
-				case 5:
 					label.SetText(string(authorList[id.Row-1].FirstCommit.Format("2 Jan 2006 15:04:05")))
-				case 6:
+				case 4:
 					label.SetText(string(authorList[id.Row-1].LastCommit.Format("2 Jan 2006 15:04:05")))
 				default:
 					label.SetText(" ")
@@ -87,7 +79,7 @@ func RenderContributorTab(wrapper fyne.CanvasObject, data ContributorData) {
 		},
 	)
 
-	for i := 0; i <= 6; i++ {
+	for i := 0; i <= 4; i++ {
 		table.SetColumnWidth(i, 200)
 	}
 	contributorWrapper := wrapper.(*widget.Card)

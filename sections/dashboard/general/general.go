@@ -22,14 +22,16 @@ func RenderGeneralTab(wrapper fyne.CanvasObject, data GeneralData) {
 	dayDiff := utils.GetDayDifference(startDate, endDate)
 	avgCommits := float32(len(data.Commits)) / float32(dayDiff)
 
+	go getLinesOfCodeInformation(data.FileInformation, []string{data.ProjectDir})
+
 	// create components to render
 	projectNameLabel := widget.NewLabel(data.ProjectName)
 	startDateLabel := widget.NewLabel(data.RepoStartDate)
-	filesLabel := widget.NewLabel(fmt.Sprintf("%d files", data.TotalFiles))
-	linesoCodeLabel := widget.NewLabel(fmt.Sprintf("%d lines", data.TotalCode))
-	commentLabel := widget.NewLabel(fmt.Sprintf("%d lines", data.TotalComments))
-	blankLabel := widget.NewLabel(fmt.Sprintf("%d lines", data.TotalBlanks))
 	commitsLabel := widget.NewLabel(fmt.Sprintf("%d (%f average per all days)", len(data.Commits), avgCommits))
+	filesLabel := widget.NewLabelWithData(data.TotalFiles)
+	linesoCodeLabel := widget.NewLabelWithData(data.TotalCode)
+	commentLabel := widget.NewLabelWithData(data.TotalComments)
+	blankLabel := widget.NewLabelWithData(data.TotalBlanks)
 	authorLabel := widget.NewLabel(fmt.Sprintf("%d contributors", len(authors)))
 	form := &widget.Form{
 		Items: []*widget.FormItem{

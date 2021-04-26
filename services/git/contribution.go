@@ -12,11 +12,11 @@ type Author struct {
 }
 
 type AuthorInfo struct {
-	TotalCommit   int
-	TotalAddLines int
-	TotalDelLines int
-	LastCommit    time.Time
-	FirstCommit   time.Time
+	TotalCommit int
+	// TotalAddLines int
+	// TotalDelLines int
+	LastCommit  time.Time
+	FirstCommit time.Time
 }
 
 func (r *GitConfig) GetAuthorInfoByAuthor(commits []*object.Commit) (map[Author]AuthorInfo, error) {
@@ -26,31 +26,33 @@ func (r *GitConfig) GetAuthorInfoByAuthor(commits []*object.Commit) (map[Author]
 			Name:  c.Author.Name,
 			Email: c.Author.Email,
 		}
-		stats, err := c.Stats()
-		if err != nil {
-			return authorInfoMap, err
-		}
 
-		currAddition := 0
-		currDeletion := 0
-		for _, val := range stats {
-			currAddition += val.Addition
-			currDeletion += val.Deletion
-		}
+		// Disable stats for now cuz it's slow
+		// stats, err := c.Stats()
+		// if err != nil {
+		// 	return authorInfoMap, err
+		// }
+
+		// currAddition := 0
+		// currDeletion := 0
+		// for _, val := range stats {
+		// 	currAddition += val.Addition
+		// 	currDeletion += val.Deletion
+		// }
 
 		if authorInfo, ok := authorInfoMap[currAuthor]; ok {
 			authorInfo.FirstCommit = c.Author.When
 			authorInfo.TotalCommit++
-			authorInfo.TotalAddLines += currAddition
-			authorInfo.TotalDelLines += currDeletion
+			// authorInfo.TotalAddLines += currAddition
+			// authorInfo.TotalDelLines += currDeletion
 			authorInfoMap[currAuthor] = authorInfo
 		} else {
 			authorInfo := AuthorInfo{
-				TotalCommit:   1,
-				TotalAddLines: currAddition,
-				TotalDelLines: currDeletion,
-				LastCommit:    c.Author.When,
-				FirstCommit:   c.Author.When,
+				TotalCommit: 1,
+				// TotalAddLines: currAddition,
+				// TotalDelLines: currDeletion,
+				LastCommit:  c.Author.When,
+				FirstCommit: c.Author.When,
 			}
 			authorInfoMap[currAuthor] = authorInfo
 		}
