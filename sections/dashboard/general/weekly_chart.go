@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gitmonitor/services/utils"
 	"image"
+	"math"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -15,7 +16,7 @@ import (
 )
 
 func getCommitsCountByWeeks(commits []*object.Commit, weeks int) []int {
-	commitsCount := []int{0}
+	commitsCount := []int{}
 
 	// get the beginning of current date
 	now := time.Now()
@@ -30,6 +31,9 @@ func getCommitsCountByWeeks(commits []*object.Commit, weeks int) []int {
 		}
 
 		if v.Author.When.After(beginningOfWeek) {
+			if len(commitsCount) == 0 {
+				commitsCount = append(commitsCount, 1)
+			}
 			commitsCount[len(commitsCount)-1] += 1
 		} else {
 			beginningOfWeek = beginningOfWeek.AddDate(0, 0, -7)
@@ -42,20 +46,22 @@ func getCommitsCountByWeeks(commits []*object.Commit, weeks int) []int {
 	return commitsCount
 }
 
-func toChartValue(elements []int, placeholder string) []chart.Value {
+func toChartValueAndGetMax(elements []int, placeholder string) ([]chart.Value, float64) {
 	var chartValue []chart.Value
+	max := float64(0)
 	for index, element := range elements {
 		chartValue = append(chartValue, chart.Value{
 			Value: float64(element),
 			Label: fmt.Sprintf(placeholder, index+1),
 		})
+		max = math.Max(max, float64(element))
 	}
-	return chartValue
+	return chartValue, max
 }
 
 func getWeeklyChart(commits []*object.Commit) image.Image {
 	last10WeeksCommitsCount := getCommitsCountByWeeks(commits, 10)
-	chartValue := toChartValue(last10WeeksCommitsCount, "Week-%d")
+	chartValue, maxVal := toChartValueAndGetMax(last10WeeksCommitsCount, "Week-%d")
 
 	graph := chart.BarChart{
 		Background: chart.Style{
@@ -68,6 +74,10 @@ func getWeeklyChart(commits []*object.Commit) image.Image {
 		Bars:     chartValue,
 		YAxis: chart.YAxis{
 			ValueFormatter: chart.IntValueFormatter,
+			Range: &chart.ContinuousRange{
+				Min: 0,
+				Max: maxVal,
+			},
 		},
 	}
 

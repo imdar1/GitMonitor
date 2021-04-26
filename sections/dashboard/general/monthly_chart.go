@@ -23,22 +23,24 @@ func getThisMonthCommits(commits []*object.Commit) []int {
 			break
 		}
 
-		if v.Author.When.Day() < lastDayChecked {
-			commitsCount = append(commitsCount, 1)
-		} else if v.Author.When.Day() == lastDayChecked {
+		if v.Author.When.Day() == lastDayChecked {
+			commitsCount[len(commitsCount)-1] += 1
+		} else if v.Author.When.Day() < lastDayChecked {
+			for i := lastDayChecked; i > v.Author.When.Day(); i-- {
+				commitsCount = append(commitsCount, 0)
+			}
 			commitsCount[len(commitsCount)-1] += 1
 		}
 		lastDayChecked = v.Author.When.Day()
 	}
 
-	// now reverse the array
 	commitsCount = utils.Reverse(commitsCount)
 	return commitsCount
 }
 
 func getMonthlyChart(commits []*object.Commit) image.Image {
 	thisMonthCommits := getThisMonthCommits(commits)
-	chartValue := toChartValue(thisMonthCommits, "Day-%d")
+	chartValue, maxVal := toChartValueAndGetMax(thisMonthCommits, "Day-%d")
 
 	graph := chart.BarChart{
 		Background: chart.Style{
@@ -46,11 +48,19 @@ func getMonthlyChart(commits []*object.Commit) image.Image {
 				Top: 40,
 			},
 		},
-		Height:   512,
-		BarWidth: 40,
-		Bars:     chartValue,
+		Height:       512,
+		BarWidth:     20,
+		UseBaseValue: true,
+		BaseValue:    0,
+		Bars:         chartValue,
+		XAxis: chart.Style{
+			TextRotationDegrees: 90,
+		},
 		YAxis: chart.YAxis{
-			ValueFormatter: chart.IntValueFormatter,
+			Range: &chart.ContinuousRange{
+				Min: 0,
+				Max: maxVal,
+			},
 		},
 	}
 
