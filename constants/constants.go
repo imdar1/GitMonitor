@@ -10,7 +10,8 @@ const INIT_BRANCH_TABLE = `CREATE TABLE IF NOT EXISTS branch(
 	"branch_id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 	"project_id" INTEGER,
 	"name" TEXT,
-	"is_default" INTEGER DEFAULT 0,
+	"is_merge_target" INTEGER DEFAULT 0,
+	"is_deleted" INTEGER DEFAULT 1,
 	FOREIGN KEY (project_id)
 	REFERENCES project (project_id)
 		ON DELETE CASCADE 

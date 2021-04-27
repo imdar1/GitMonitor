@@ -5,4 +5,5 @@ type Branch struct {
 	ProjectId int
 	Name      string
 	IsDefault bool
+	IsDeleted bool
 }

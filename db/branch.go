@@ -9,6 +9,9 @@ import (
 
 func (db *DBConfig) GetBranchesData(projectId int64) ([]models.Branch, error) {
 	var branches []models.Branch
+	var isDefault int
+	var isDeleted int
+
 	query := fmt.Sprintf("SELECT * FROM branch WHERE project_id=%d;", projectId)
 	rows, err := db.Driver.Query(query)
 
@@ -22,9 +25,12 @@ func (db *DBConfig) GetBranchesData(projectId int64) ([]models.Branch, error) {
 			&branch.BranchId,
 			&branch.ProjectId,
 			&branch.Name,
-			&branch.IsDefault,
+			&isDefault,
+			&isDeleted,
 		)
 		utils.CheckErr(err)
+		branch.IsDefault = isDefault == 1
+		branch.IsDeleted = isDeleted == 1
 		branches = append(branches, branch)
 	}
 	rows.Close()
@@ -34,11 +40,13 @@ func (db *DBConfig) GetBranchesData(projectId int64) ([]models.Branch, error) {
 func (db *DBConfig) GetBranchById(branchId int) models.Branch {
 	var branch models.Branch
 	var isDefault int
+	var isDeleted int
 
 	query := fmt.Sprintf("SELECT * FROM branch WHERE branch_id='%d' LIMIT 1;", branchId)
 	rows := db.Driver.QueryRow(query)
-	err := rows.Scan(&branch.BranchId, &branch.ProjectId, &branch.Name, &isDefault)
+	err := rows.Scan(&branch.BranchId, &branch.ProjectId, &branch.Name, &isDefault, &isDeleted)
 	branch.IsDefault = isDefault == 1
+	branch.IsDeleted = isDeleted == 1
 	utils.CheckErr(err)
 
 	return branch
@@ -75,7 +83,7 @@ func (db *DBConfig) SyncBranches(projectId int64, branches []string) error {
 	for _, v := range branchesModel {
 		isExist := utils.IsExistStr(v.Name, branches)
 		if !isExist {
-			deleteQuery := fmt.Sprintf("DELETE FROM branch WHERE name='%s';", v.Name)
+			deleteQuery := fmt.Sprintf("UPDATE branch SET is_deleted=1 WHERE name='%s';", v.Name)
 			_, err := delTx.Exec(deleteQuery)
 			if err != nil {
 				delTx.Rollback()
@@ -100,7 +108,7 @@ func (db *DBConfig) SyncBranches(projectId int64, branches []string) error {
 		isExist := utils.IsExistStr(v, branchesModelList)
 		if !isExist {
 			insertQuery := fmt.Sprintf(
-				"INSERT INTO branch(project_id, name, is_default) VALUES(%d, '%s', %d); ",
+				"INSERT INTO branch(project_id, name, is_default, is_deleted) VALUES(%d, '%s', %d, 0); ",
 				projectId,
 				v,
 				isDefault,
