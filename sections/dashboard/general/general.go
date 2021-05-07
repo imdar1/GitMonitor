@@ -54,7 +54,7 @@ func RenderGeneralTab(wrapper fyne.CanvasObject, data GeneralData) {
 	)
 	monthlyChartWrapper := widget.NewCard(
 		"Monthly Chart",
-		"Total number of commits every day this month.",
+		"Total number of commits in the last 30-day.",
 		getMonthlyChartCanvas(data.Commits),
 	)
 	vBox := container.NewVBox(projectInfoWrapper, weeklyChartWrapper, monthlyChartWrapper)

@@ -56,6 +56,11 @@ func BeginningOfMonth() time.Time {
 	return time.Date(y, m, 1, 0, 0, 0, 0, now.Location())
 }
 
+func BeginningOfDay(now time.Time) time.Time {
+	y, m, d := now.Date()
+	return time.Date(y, m, d, 0, 0, 0, 0, now.Location())
+}
+
 // Find element from a given array of string. Condition: list is already sorted
 func IsExistStr(element string, list []string) bool {
 	for _, v := range list {

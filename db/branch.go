@@ -29,7 +29,7 @@ func (db *DBConfig) GetBranchesData(projectId int64) ([]models.Branch, error) {
 			&isDeleted,
 		)
 		utils.CheckErr(err)
-		branch.IsDefault = isDefault == 1
+		branch.IsMergeTarget = isDefault == 1
 		branch.IsDeleted = isDeleted == 1
 		branches = append(branches, branch)
 	}
@@ -45,7 +45,7 @@ func (db *DBConfig) GetBranchById(branchId int) models.Branch {
 	query := fmt.Sprintf("SELECT * FROM branch WHERE branch_id='%d' LIMIT 1;", branchId)
 	rows := db.Driver.QueryRow(query)
 	err := rows.Scan(&branch.BranchId, &branch.ProjectId, &branch.Name, &isDefault, &isDeleted)
-	branch.IsDefault = isDefault == 1
+	branch.IsMergeTarget = isDefault == 1
 	branch.IsDeleted = isDeleted == 1
 	utils.CheckErr(err)
 
@@ -108,7 +108,7 @@ func (db *DBConfig) SyncBranches(projectId int64, branches []string) error {
 		isExist := utils.IsExistStr(v, branchesModelList)
 		if !isExist {
 			insertQuery := fmt.Sprintf(
-				"INSERT INTO branch(project_id, name, is_default, is_deleted) VALUES(%d, '%s', %d, 0); ",
+				"INSERT INTO branch(project_id, name, is_merge_target, is_deleted) VALUES(%d, '%s', %d, 0); ",
 				projectId,
 				v,
 				isDefault,

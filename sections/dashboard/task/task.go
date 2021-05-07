@@ -127,6 +127,7 @@ func RenderTaskTab(taskWrapper fyne.CanvasObject, taskData TaskData, db *db.DBCo
 		}
 
 		selectedTask := taskData.Tasks[taskIndex]
+		// showTaskWindow(taskWrapperCard, tas)
 		showModifyTaskWindow(selectedTask, db)
 	})
 	actionButton := container.NewHBox(layout.NewSpacer(), addTaskButton, setBranchButton)

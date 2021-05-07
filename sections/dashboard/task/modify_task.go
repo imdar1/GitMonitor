@@ -31,8 +31,20 @@ func getBranchesName(branches []models.Branch) []string {
 	return branchesName
 }
 
+func getBranchName(branchId int, branches []models.Branch) string {
+	name := ""
+	for _, v := range branches {
+		if v.BranchId == branchId {
+			name = v.Name
+			break
+		}
+	}
+	return name
+}
+
 func getTaskForm(data *formData, onSubmit func(), onClose func()) fyne.CanvasObject {
 	taskNameEntry := widget.NewEntry()
+	taskNameEntry.SetText(data.task.Name)
 	taskNameEntry.SetPlaceHolder("Improve X Feature")
 	taskNameEntry.OnChanged = func(s string) {
 		data.task.Name = s
@@ -40,30 +52,39 @@ func getTaskForm(data *formData, onSubmit func(), onClose func()) fyne.CanvasObj
 
 	taskStartDateEntry := widget.NewEntry()
 	taskStartDateEntry.SetPlaceHolder("DD/MM/YYYY format")
+	if data.task.StartDate > 0 {
+		taskStartDateEntry.SetText(time.Unix(data.task.StartDate, 0).Format("02/01/2006"))
+	}
 	taskStartDateEntry.OnChanged = func(s string) {
 		data.tempStartDate = s
 	}
 
 	taskEndDateEntry := widget.NewEntry()
 	taskEndDateEntry.SetPlaceHolder("DD/MM/YYYY format")
+	if data.task.EndDate > 0 {
+		taskEndDateEntry.SetText(time.Unix(data.task.EndDate, 0).Format("02/01/2006"))
+	}
 	taskEndDateEntry.OnChanged = func(s string) {
 		data.tempEndDate = s
 	}
 
 	taskAssigneeNameEntry := widget.NewEntry()
 	taskAssigneeNameEntry.SetPlaceHolder("Username of the task author")
+	taskAssigneeNameEntry.SetText(data.task.AssigneeName)
 	taskAssigneeNameEntry.OnChanged = func(s string) {
 		data.task.AssigneeName = s
 	}
 
 	taskAssigneeEmailEntry := widget.NewEntry()
 	taskAssigneeEmailEntry.SetPlaceHolder("Email of the task author")
+	taskAssigneeEmailEntry.SetText(data.task.AssigneeEmail)
 	taskAssigneeEmailEntry.OnChanged = func(s string) {
 		data.task.AssigneeEmail = s
 	}
 
 	branchesName := getBranchesName(data.branches)
 	taskBranchEntry := widget.NewSelectEntry(branchesName) // TODO: read branches from db
+	taskBranchEntry.SetText(getBranchName(data.task.BranchId, data.branches))
 	taskBranchEntry.SetPlaceHolder("Feature branch to work on this task")
 	taskBranchEntry.OnChanged = func(s string) {
 		data.tempBranch = s

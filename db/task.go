@@ -66,6 +66,10 @@ func (db *DBConfig) AddTask(task models.Task) error {
 	return err
 }
 
+func (db *DBConfig) UpdateTask(task models.Task) error {
+	return nil
+}
+
 func getBranchIdList(branches []models.Branch) []int {
 	var branchIdList []int
 	for _, v := range branches {

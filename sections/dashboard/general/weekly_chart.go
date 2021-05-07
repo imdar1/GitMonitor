@@ -20,8 +20,7 @@ func getCommitsCountByWeeks(commits []*object.Commit, weeks int) []int {
 
 	// get the beginning of current date
 	now := time.Now()
-	y, m, d := now.Date()
-	beginningOfDay := time.Date(y, m, d, 0, 0, 0, 0, now.Location())
+	beginningOfDay := utils.BeginningOfDay(now)
 
 	// get the beginning of current week (date of the latest sunday)
 	beginningOfWeek := beginningOfDay.AddDate(0, 0, int(beginningOfDay.Weekday())*-1)
@@ -51,6 +50,10 @@ func toChartValueAndGetMax(elements []int, placeholder string) ([]chart.Value, f
 	max := float64(0)
 	for index, element := range elements {
 		chartValue = append(chartValue, chart.Value{
+			Style: chart.Style{
+				Hidden:    false,
+				ClassName: fmt.Sprint(element),
+			},
 			Value: float64(element),
 			Label: fmt.Sprintf(placeholder, index+1),
 		})

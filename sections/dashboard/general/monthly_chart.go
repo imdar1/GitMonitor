@@ -38,9 +38,42 @@ func getThisMonthCommits(commits []*object.Commit) []int {
 	return commitsCount
 }
 
+func getLast30DayCommits(commits []*object.Commit) []int {
+	commitsCount := []int{}
+	count := 0
+	itr := 0
+	currentDate := time.Now()
+
+	for {
+		beginningOfDay := utils.BeginningOfDay(currentDate)
+		dayDiff := utils.GetDayDifference(utils.BeginningOfDay(commits[itr].Author.When), beginningOfDay)
+		beginningOfDay = beginningOfDay.AddDate(0, 0, -dayDiff)
+		for ; dayDiff > 0; dayDiff-- {
+			commitsCount = append(commitsCount, 0)
+			count++
+			if count == 30 {
+				return commitsCount
+			}
+		}
+
+		currCommitCount := 0
+		for utils.BeginningOfDay(commits[itr].Author.When).Equal(beginningOfDay) {
+			currCommitCount++
+			itr++
+		}
+		commitsCount = append(commitsCount, currCommitCount)
+		count++
+		if count == 30 {
+			return commitsCount
+		}
+	}
+}
+
 func getMonthlyChart(commits []*object.Commit) image.Image {
-	thisMonthCommits := getThisMonthCommits(commits)
+	thisMonthCommits := getLast30DayCommits(commits)
 	chartValue, maxVal := toChartValueAndGetMax(thisMonthCommits, "Day-%d")
+	// prevent runtime error whenever each element is 0
+	maxVal += 1
 
 	graph := chart.BarChart{
 		Background: chart.Style{
