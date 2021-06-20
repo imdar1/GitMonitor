@@ -19,6 +19,7 @@ func GetContent(w fyne.Window, dbConfig *db.DBConfig) fyne.CanvasObject {
 	}
 	profile := profile.GetProfileWindow(w, &appState)
 	dashboard := dashboard.GetDashboardWindow(w, &appState)
-	appState.OnDatabaseLoaded()
+	appState.OnWindowLoaded()
+
 	return container.NewBorder(profile, nil, nil, nil, dashboard)
 }

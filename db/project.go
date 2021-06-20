@@ -8,14 +8,15 @@ import (
 )
 
 func (db *DBConfig) GetProjects() []models.Project {
+	const serviceName = "GetProjects"
 	var projects []models.Project
 	rows, err := db.Driver.Query("SELECT * FROM project")
-	utils.CheckErr(err)
+	utils.CheckErr(serviceName, err)
 	if rows != nil {
 		for rows.Next() {
 			var project models.Project
 			err = rows.Scan(&project.ProjectId, &project.ProjectDir)
-			utils.CheckErr(err)
+			utils.CheckErr(serviceName, err)
 			projects = append(projects, project)
 		}
 		rows.Close()
@@ -25,6 +26,7 @@ func (db *DBConfig) GetProjects() []models.Project {
 
 func (db *DBConfig) GetProjectByDir(dir string) models.Project {
 	var project models.Project
+	const serviceName = "GetProjectByDir"
 
 	query := fmt.Sprintf("SELECT * FROM project WHERE project_dir='%s' LIMIT 1;", dir)
 	rows := db.Driver.QueryRow(query)
@@ -37,21 +39,22 @@ func (db *DBConfig) GetProjectByDir(dir string) models.Project {
 		project.ProjectId = id
 		return project
 	}
-	utils.CheckErr(err)
+	utils.CheckErr(serviceName, err)
 
 	return project
 }
 
 func (db *DBConfig) insertProject(p models.Project) int64 {
+	const serviceName = "insertProject"
 	dir := p.ProjectDir
 	insertQuery := fmt.Sprintf("INSERT INTO project(project_dir) VALUES('%s');", dir)
 	statement, err := db.Driver.Prepare(insertQuery)
-	utils.CheckErr(err)
+	utils.CheckErr(serviceName, err)
 
 	result, err := statement.Exec()
-	utils.CheckErr(err)
+	utils.CheckErr(serviceName, err)
 
 	id, err := result.LastInsertId()
-	utils.CheckErr(err)
+	utils.CheckErr(serviceName, err)
 	return id
 }

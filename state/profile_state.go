@@ -1,7 +1,6 @@
 package state
 
 import (
-	"gitmonitor/db"
 	"gitmonitor/models"
 
 	"fyne.io/fyne/v2/widget"
@@ -20,8 +19,8 @@ func getProjectName(p []models.Project) []string {
 	return projectName
 }
 
-func (p *ProfileState) OnDatabaseLoaded(db *db.DBConfig) {
-	projectList := db.GetProjects()
+func (p *ProfileState) OnWindowLoaded(appData *AppData) {
+	projectList := appData.Database.GetProjects()
 	if projectList != nil {
 		p.projects = projectList
 		projectName := getProjectName(p.projects)
@@ -29,9 +28,9 @@ func (p *ProfileState) OnDatabaseLoaded(db *db.DBConfig) {
 	}
 }
 
-func (p *ProfileState) OnRepositoryLoaded(appData AppData) models.Project {
+func (p *ProfileState) OnRepositoryLoaded(appData *AppData) {
 	project := appData.Database.GetProjectByDir(p.ProjectEntry.Text)
 	projectName := getProjectName(p.projects)
 	p.ProjectEntry.SetOptions(projectName)
-	return project
+	appData.SelectedProject = project
 }

@@ -100,7 +100,7 @@ func getMonthlyChart(commits []*object.Commit) image.Image {
 	buf := new(bytes.Buffer)
 	graph.Render(chart.PNG, buf)
 	img, _, err := image.Decode(buf)
-	utils.CheckErr(err)
+	utils.CheckErr("getMonthlyChart", err)
 
 	return img
 }

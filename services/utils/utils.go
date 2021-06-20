@@ -27,9 +27,9 @@ func GetDayDifference(start time.Time, end time.Time) int {
 	return int(end.Sub(start).Hours()/24) + 1
 }
 
-func CheckErr(err error) {
+func CheckErr(serviceName string, err error) {
 	if err != nil {
-		log.Printf("Error: %s", err.Error())
+		log.Printf("[%s] Error: %s", serviceName, err.Error())
 	}
 }
 

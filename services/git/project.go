@@ -1,26 +1,35 @@
 package git
 
 import (
-	"fmt"
-	"gitmonitor/constants"
+	"gitmonitor/services/utils"
 
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/go-git/go-git/v5/plumbing/transport"
 )
 
-func GetAuthors(commits []*object.Commit) []string {
-	set := make(map[string]bool)
-	var signatures []string
-	for _, v := range commits {
-		authorFormat := fmt.Sprintf("%s%s%s", v.Author.Email, constants.Separator, v.Author.Name)
-		set[authorFormat] = true
+func (r *GitConfig) FetchAndCheckout(askAuth func() transport.AuthMethod) error {
+	const serviceName = "FetchAndCheckout"
+
+	// Fetch remote repository
+	err := r.repo.Fetch(&git.FetchOptions{})
+	if err == transport.ErrAuthenticationRequired {
+		r.auth = askAuth()
+		err = r.repo.Fetch(&git.FetchOptions{
+			Auth: r.auth,
+		})
 	}
 
-	for k := range set {
-		signatures = append(signatures, k)
-	}
+	w, err := r.repo.Worktree()
+	utils.CheckErr(serviceName, err)
 
-	return signatures
+	// Checking out to origin/master
+	return w.Checkout(&git.CheckoutOptions{
+		Branch: plumbing.NewRemoteHEADReferenceName("origin"),
+		Keep:   true,
+	})
+
 }
 
 func (r *GitConfig) GetOriginUrl() string {
@@ -50,15 +59,16 @@ func (r *GitConfig) GetPaths() ([]string, error) {
 	for _, entry := range tree.Entries {
 		paths = append(paths, entry.Name)
 	}
-	fmt.Println(paths)
 
 	return paths, nil
 }
 
 func (r *GitConfig) GetCommitObjects() ([]*object.Commit, error) {
-	cIter, err := r.repo.Log(&git.LogOptions{Order: git.LogOrderCommitterTime})
+	cIter, err := r.repo.Log(&git.LogOptions{
+		Order: git.LogOrderCommitterTime,
+	})
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 	var commits []*object.Commit
 	cIter.ForEach(func(c *object.Commit) error {

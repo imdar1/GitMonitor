@@ -9,9 +9,10 @@ import (
 
 func (db *DBConfig) GetTasksData(projectId int64) []models.Task {
 	var tasks []models.Task
+	const serviceName = "GetTasksData"
 	query := fmt.Sprintf("SELECT * FROM task WHERE project_id=%d ORDER BY start_date ASC;", projectId)
 	rows, err := db.Driver.Query(query)
-	utils.CheckErr(err)
+	utils.CheckErr(serviceName, err)
 
 	if rows != nil {
 		for rows.Next() {
@@ -27,7 +28,7 @@ func (db *DBConfig) GetTasksData(projectId int64) []models.Task {
 				&task.StartDate,
 				&task.EndDate,
 			)
-			utils.CheckErr(err)
+			utils.CheckErr(serviceName, err)
 			tasks = append(tasks, task)
 		}
 		rows.Close()
@@ -36,6 +37,7 @@ func (db *DBConfig) GetTasksData(projectId int64) []models.Task {
 }
 
 func (db *DBConfig) AddTask(task models.Task) error {
+	const serviceName = "AddTasks"
 	insertQuery := fmt.Sprintf(
 		`INSERT INTO task(
 			project_id, 
@@ -58,10 +60,10 @@ func (db *DBConfig) AddTask(task models.Task) error {
 		task.EndDate,
 	)
 	statement, err := db.Driver.Prepare(insertQuery)
-	utils.CheckErr(err)
+	utils.CheckErr(serviceName, err)
 
 	_, err = statement.Exec()
-	utils.CheckErr(err)
+	utils.CheckErr(serviceName, err)
 
 	return err
 }
@@ -80,11 +82,12 @@ func getBranchIdList(branches []models.Branch) []int {
 
 func (db *DBConfig) taskStatusIsInProgress(branchId int) bool {
 	var taskStatus int
+	const serviceName = "taskStatusIsInProgress"
 	query := fmt.Sprintf("SELECT task_status FROM task WHERE branch_id=%d", branchId)
 	rows := db.Driver.QueryRow(query)
 	err := rows.Scan(&taskStatus)
 	if err != nil {
-		utils.CheckErr(err)
+		utils.CheckErr(serviceName, err)
 		return false
 	}
 

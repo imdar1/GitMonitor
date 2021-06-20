@@ -52,8 +52,9 @@ func getTasksListCanvas(
 		taskDetail.Refresh()
 	}
 	list.OnUnselected = func(id widget.ListItemID) {
-		taskDetail := taskInfoCanvas.(*container.Scroll)
-		taskDetail.Content = widget.NewLabel("Infomasi Task")
+		taskDetail := taskInfoCanvas.(*fyne.Container)
+		taskDetail.Remove(taskDetail.Objects[0])
+		taskDetail.Add(widget.NewLabel("Infomasi Task"))
 		selectedTaskIndex.Set(-1)
 		taskDetail.Refresh()
 	}
@@ -97,7 +98,7 @@ func RenderTaskTab(taskWrapper fyne.CanvasObject, taskData TaskData, db *db.DBCo
 	} else {
 		byteImg := timeData.getGanttChartImage()
 		ganttChartImg, _, err := image.Decode(bytes.NewReader(byteImg))
-		utils.CheckErr(err)
+		utils.CheckErr("RenderTaskTab", err)
 
 		ganttChartObj := canvas.NewImageFromImage(ganttChartImg)
 		ganttChartObj.FillMode = canvas.ImageFillOriginal

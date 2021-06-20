@@ -24,7 +24,6 @@ func (r *GitConfig) GetBranchList() []string {
 
 func (r *GitConfig) GetRemoteBranches(askAuth func() transport.AuthMethod) ([]string, error) {
 	var remoteBranches []string
-	r.repo.Fetch(&git.FetchOptions{})
 
 	// Get remote repository, by default is origin
 	rem, err := r.repo.Remote("origin")
@@ -36,9 +35,11 @@ func (r *GitConfig) GetRemoteBranches(askAuth func() transport.AuthMethod) ([]st
 	if err != nil {
 		if err == transport.ErrAuthenticationRequired {
 			// need authentication, ask user for auth method
-			authMethod := askAuth()
+			if r.auth == nil {
+				r.auth = askAuth()
+			}
 			refs, err = rem.List(&git.ListOptions{
-				Auth: authMethod,
+				Auth: r.auth,
 			})
 			if err != nil {
 				return remoteBranches, err

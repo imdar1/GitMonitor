@@ -2,12 +2,14 @@ package state
 
 import (
 	"gitmonitor/db"
+	"gitmonitor/models"
 	"gitmonitor/services/git"
 )
 
 type AppData struct {
-	Repo     git.GitConfig
-	Database *db.DBConfig
+	Repo            git.GitConfig
+	Database        *db.DBConfig
+	SelectedProject models.Project
 }
 
 type AppState struct {
@@ -16,12 +18,12 @@ type AppState struct {
 	DashboardState TabItemsState
 }
 
-func (a *AppState) OnDatabaseLoaded() {
-	a.ProfileState.OnDatabaseLoaded(a.Database)
-	a.DashboardState.OnDatabaseLoaded(a.Database)
+func (a *AppState) OnWindowLoaded() {
+	a.ProfileState.OnWindowLoaded(&a.AppData)
+	a.DashboardState.OnWindowLoaded(&a.AppData)
 }
 
 func (a *AppState) OnRepositoryLoaded() {
-	selectedProject := a.ProfileState.OnRepositoryLoaded(a.AppData)
-	a.DashboardState.OnRepositoryLoaded(a.AppData, selectedProject)
+	a.ProfileState.OnRepositoryLoaded(&a.AppData)
+	a.DashboardState.OnRepositoryLoaded(&a.AppData)
 }

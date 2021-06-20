@@ -35,7 +35,7 @@ func getLinesOfCodeInformation(fileInformation FileInformation, paths []string) 
 
 	processor := gocloc.NewProcessor(languages, options)
 	result, err := processor.Analyze(paths)
-	utils.CheckErr(err)
+	utils.CheckErr("getLinesOfCodeInformation", err)
 
 	fileInformation.TotalFiles.Set(fmt.Sprintf("%d files", len(result.Files)))
 	fileInformation.TotalCode.Set(fmt.Sprintf("%d lines", int(result.Total.Code)))
@@ -59,7 +59,7 @@ func InitGeneralData(project models.Project, r git.GitConfig) GeneralData {
 	if err == nil {
 		data.Commits = commits
 	} else {
-		fmt.Println(err)
+		utils.CheckErr("InitGeneralData", err)
 	}
 
 	if len(commits) > 0 {

@@ -13,7 +13,7 @@ type ContributorData struct {
 
 func InitContributorData(commits []*object.Commit, r git.GitConfig) ContributorData {
 	contributorMap, err := r.GetAuthorInfoByAuthor(commits)
-	utils.CheckErr(err)
+	utils.CheckErr("InitContributorData", err)
 
 	return ContributorData{
 		authorMap: contributorMap,

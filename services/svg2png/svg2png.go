@@ -41,7 +41,7 @@ func GetImage(svg string) []byte {
 	</html>`
 	html := fmt.Sprintf(htmlTemplate, svg)
 	err := chromedp.Run(ctx, elementScreenshot(html, `svg`, &buf))
-	utils.CheckErr(err)
+	utils.CheckErr("GetImageSVG2PNG", err)
 
 	return buf
 }
