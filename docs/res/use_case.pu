@@ -8,12 +8,10 @@ rectangle "Essence Project" {
     usecase "Atur task proyek" as uc3
     usecase "Lihat timeline task proyek" as uc4
     usecase "Lihat informasi proyek\nberdasarkan data Git" as uc5
-    usecase "Atur periode\npembaruan data Git" as uc6
 } 
 u --> uc1
 u --> uc2
 u --> uc3
 u --> uc5
 uc3 <.. uc4 : <<extend>>
-u --> uc6
 @enduml

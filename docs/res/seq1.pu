@@ -2,19 +2,30 @@
 skinparam monochrome true
 actor User as user
 participant "DirectoryExplorer" as a1
+participant "GitController" as a2
+database "Database" as db
 
 user -> a1: setDirectory
 activate a1
 
-a1 -> a1: verifyDirectory
-activate a1
-deactivate a1
+a1 -> a2: verifyDirectory
+activate a2
 
 alt valid directory
+    a2 -> a2: syncWithRemote
+    activate a2
+    deactivate a2
+    a2 -> db: saveDirectory
+    activate db
+    db --> a2
+    deactivate db
+    a2 --> a1: Directory OK
     a1 --> user: Directory Accepted
 else invalid directory
+    a2 --> a1: No Git found
     a1 --> user: Invalid Git Directory
 end
+deactivate a2
 deactivate a1
 
 @enduml

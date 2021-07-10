@@ -1,0 +1,196 @@
+@startuml
+skinparam monochrome true
+hide circle
+
+namespace contribution {
+    class ContributorData << (S,Aquamarine) >> {
+        - authorMap <font color=blue>map</font>[git.Author]git.AuthorInfo
+
+    }
+    class authorTable << (S,Aquamarine) >> {
+    }
+}
+"git.Author" *-- "contribution.authorTable"
+"git.AuthorInfo" *-- "contribution.authorTable"
+
+
+
+namespace db {
+    class DBConfig << (S,Aquamarine) >> {
+        + Driver *sql.DB
+        + Close <font color=blue>func</font>() 
+
+        - insertProject(p models.Project) int64
+        - taskStatusIsInProgress(branchId int) bool
+
+        + GetBranchesData(projectId int64) ([]models.Branch, error)
+        + GetBranchById(branchId int) models.Branch
+        + GetBranchIdByName(branchName string) int
+        + SyncBranches(projectId int64, branches []string) error
+        + GetProjects() []models.Project
+        + GetProjectByDir(dir string) models.Project
+        + GetTasksData(projectId int64) []models.Task
+        + AddTask(task models.Task) error
+        + UpdateTask(task models.Task) error
+        + SyncTask(tasks []models.Task, branches []models.Branch) error
+
+    }
+}
+
+namespace general {
+    class FileInformation << (S,Aquamarine) >> {
+        + TotalFiles binding.String
+        + TotalCode binding.String
+        + TotalComments binding.String
+        + TotalBlanks binding.String
+
+    }
+    class GeneralData << (S,Aquamarine) >> {
+        + ProjectDir string
+        + OriginUrl string
+        + ProjectName string
+        + RepoStartDate string
+        + Commits []*object.Commit
+
+    }
+}
+"general.FileInformation" *-- "general.GeneralData"
+
+namespace git {
+    left to right direction
+    class Author << (S,Aquamarine) >> {
+        + Name string
+        + Email string
+
+    }
+    class AuthorInfo << (S,Aquamarine) >> {
+        + TotalCommit int
+        + LastCommit time.Time
+        + FirstCommit time.Time
+
+    }
+    class GitConfig << (S,Aquamarine) >> {
+        - repo *git.Repository
+        - auth transport.AuthMethod
+
+        + GetBranchList() []string
+        + GetRemoteBranches(askAuth <font color=blue>func</font>() transport.AuthMethod) ([]string, error)
+        + GetAuthorInfoByAuthor(commits []*object.Commit) (<font color=blue>map</font>[Author]{packageName}AuthorInfo, error)
+        + FetchAndCheckout(askAuth <font color=blue>func</font>() transport.AuthMethod) error
+        + GetOriginUrl() string
+        + GetPaths() ([]string, error)
+        + GetCommitObjects() ([]*object.Commit, error)
+
+    }
+}
+
+namespace models {
+    class Branch << (S,Aquamarine) >> {
+        + BranchId int
+        + ProjectId int
+        + Name string
+        + IsMergeTarget bool
+        + IsDeleted bool
+
+    }
+    class Project << (S,Aquamarine) >> {
+        + ProjectId int64
+        + ProjectDir string
+
+    }
+    class Task << (S,Aquamarine) >> {
+        + TaskId int
+        + ProjectId int64
+        + BranchId int
+        + Name string
+        + AssigneeName string
+        + AssigneeEmail string
+        + TaskStatus int
+        + StartDate int64
+        + EndDate int64
+
+    }
+}
+
+
+
+namespace state {
+    class AppData << (S,Aquamarine) >> {
+        + Repo git.GitConfig
+        + Database *db.DBConfig
+        + SelectedProject models.Project
+
+    }
+    class AppState << (S,Aquamarine) >> {
+        + ProfileState ProfileState
+        + DashboardState TabItemsState
+
+        + OnWindowLoaded() 
+        + OnRepositoryLoaded() 
+
+    }
+    class ProfileState << (S,Aquamarine) >> {
+        - projects []models.Project
+
+        + ProjectEntry *widget.SelectEntry
+
+        + OnWindowLoaded(appData *AppData) 
+        + OnRepositoryLoaded(appData *AppData) 
+
+    }
+    class TabItemsState << (S,Aquamarine) >> {
+        + GeneralContent fyne.CanvasObject
+        + TaskContent fyne.CanvasObject
+        + ContributionContent fyne.CanvasObject
+
+        + OnWindowLoaded(appData *AppData) 
+        + OnRepositoryLoaded(appData *AppData) 
+
+    }
+}
+"state.AppData" *-u- "state.AppState"
+
+
+"state.AppData" o-- "db.DBConfig"
+"state.AppData" o-- "git.GitConfig"
+"state.AppData" o-- "models.Project"
+"state.AppState" o-u- "state.ProfileState"
+"state.AppState" o-u- "state.TabItemsState"
+
+namespace task {
+    class TaskData << (S,Aquamarine) >> {
+        + Project models.Project
+        + Tasks []models.Task
+        + Branches []models.Branch
+
+        + ReadTaskData(gitConfig git.GitConfig, db db.DBConfig) 
+
+    }
+    class formData << (S,Aquamarine) >> {
+        - projectId int64
+        - tempStartDate string
+        - tempEndDate string
+        - tempBranch string
+        - task models.Task
+        - branches []models.Branch
+
+    }
+    class taskInformation << (S,Aquamarine) >> {
+        - startDateStr string
+        - days int
+
+    }
+    class timelineData << (S,Aquamarine) >> {
+        - tasks <font color=blue>map</font>[string]taskInformation
+
+        - getGanttChartImage() []byte
+
+    }
+}
+"task.taskInformation" *-u- "task.timelineData"
+
+
+"task.TaskData" o-u- "models.Branch"
+"task.TaskData" o-u- "models.Project"
+"task.TaskData" o-- "models.Task"
+@enduml
