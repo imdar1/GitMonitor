@@ -96,8 +96,7 @@ func RenderTaskTab(taskWrapper fyne.CanvasObject, taskData TaskData, db *db.DBCo
 	if len(svgString) == 0 {
 		ganttChartCanvas = widget.NewLabel("No task found")
 	} else {
-		byteImg := timeData.getGanttChartImage()
-		ganttChartImg, _, err := image.Decode(bytes.NewReader(byteImg))
+		ganttChartImg, _, err := image.Decode(bytes.NewReader(svgString))
 		utils.CheckErr("RenderTaskTab", err)
 
 		ganttChartObj := canvas.NewImageFromImage(ganttChartImg)
