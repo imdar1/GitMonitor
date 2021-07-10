@@ -69,7 +69,6 @@ func (t *timelineData) getGanttChartImage() []byte {
 	for key, value := range t.tasks {
 		bar = ganttChart.Add(key)
 		ganttChart.Place(bar).At(date.String(value.startDateStr), value.days)
-		// fmt.Println("cekkk")
 		fmt.Printf("task name: %s , date: %s , days: %d\n", key, value.startDateStr, value.days)
 	}
 	// ganttChart.SetCaption("Project Schedule")

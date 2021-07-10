@@ -3,6 +3,7 @@ package sections
 import (
 	"gitmonitor/db"
 	"gitmonitor/sections/dashboard"
+	"gitmonitor/sections/data"
 	"gitmonitor/state"
 
 	"gitmonitor/sections/profile"
@@ -13,7 +14,7 @@ import (
 
 func GetContent(w fyne.Window, dbConfig *db.DBConfig) fyne.CanvasObject {
 	appState := state.AppState{
-		AppData: state.AppData{
+		AppData: data.AppData{
 			Database: dbConfig,
 		},
 	}

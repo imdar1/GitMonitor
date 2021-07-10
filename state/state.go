@@ -1,19 +1,9 @@
 package state
 
-import (
-	"gitmonitor/db"
-	"gitmonitor/models"
-	"gitmonitor/services/git"
-)
-
-type AppData struct {
-	Repo            git.GitConfig
-	Database        *db.DBConfig
-	SelectedProject models.Project
-}
+import "gitmonitor/sections/data"
 
 type AppState struct {
-	AppData
+	data.AppData
 	ProfileState   ProfileState
 	DashboardState TabItemsState
 }

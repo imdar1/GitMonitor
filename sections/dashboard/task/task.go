@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"gitmonitor/constants"
-	"gitmonitor/db"
 	"gitmonitor/models"
+	"gitmonitor/sections/data"
 	"gitmonitor/services/utils"
 	"image"
 	"time"
@@ -27,7 +27,7 @@ func InitTaskTab() fyne.CanvasObject {
 func getTasksListCanvas(
 	taskInfoCanvas fyne.CanvasObject,
 	taskData TaskData,
-	db *db.DBConfig,
+	appData *data.AppData,
 	selectedTaskIndex binding.Int,
 ) fyne.CanvasObject {
 	list := widget.NewList(
@@ -44,7 +44,7 @@ func getTasksListCanvas(
 
 	list.OnSelected = func(id widget.ListItemID) {
 		selectedTask := taskData.Tasks[id]
-		selectedBranch := db.GetBranchById(taskData.Tasks[id].BranchId)
+		selectedBranch := appData.Database.GetBranchById(taskData.Tasks[id].BranchId)
 		taskDetail := taskInfoCanvas.(*fyne.Container)
 		taskDetail.Remove(taskDetail.Objects[0])
 		taskDetail.Add(container.NewScroll(getTaskDetailCanvas(selectedTask, selectedBranch)))
@@ -87,7 +87,7 @@ func getTaskDetailCanvas(selectedTask models.Task, selectedBranch models.Branch)
 }
 
 /* Render task to taskWrapper from given taskData and other operations needed to perform from db */
-func RenderTaskTab(taskWrapper fyne.CanvasObject, taskData TaskData, db *db.DBConfig) {
+func RenderTaskTab(taskWrapper fyne.CanvasObject, taskData TaskData, appData *data.AppData) {
 	timeData := initData(taskData)
 	svgString := timeData.getGanttChartImage()
 	taskWrapperCard := taskWrapper.(*widget.Card)
@@ -110,12 +110,12 @@ func RenderTaskTab(taskWrapper fyne.CanvasObject, taskData TaskData, db *db.DBCo
 
 	taskDetail := container.NewBorder(nil, nil, nil, nil, widget.NewLabel("Informasi task"))
 	taskContentBottom := container.NewHSplit(
-		container.NewVScroll(getTasksListCanvas(taskDetail, taskData, db, selectedTaskIndex)),
+		container.NewVScroll(getTasksListCanvas(taskDetail, taskData, appData, selectedTaskIndex)),
 		taskDetail,
 	)
 	taskContent := container.NewVSplit(taskContentTop, taskContentBottom)
 	addTaskButton := widget.NewButton("Add Task", func() {
-		showTaskWindow(taskWrapperCard, taskData, db)
+		showTaskWindow(taskWrapperCard, taskData, appData)
 	})
 
 	setBranchButton := widget.NewButton("Edit Task", func() {
@@ -128,7 +128,7 @@ func RenderTaskTab(taskWrapper fyne.CanvasObject, taskData TaskData, db *db.DBCo
 
 		selectedTask := taskData.Tasks[taskIndex]
 		// showTaskWindow(taskWrapperCard, tas)
-		showModifyTaskWindow(selectedTask, db)
+		showModifyTaskWindow(selectedTask, appData)
 	})
 	actionButton := container.NewHBox(layout.NewSpacer(), addTaskButton, setBranchButton)
 	taskContentWrapper := container.NewBorder(nil, actionButton, nil, nil, taskContent)

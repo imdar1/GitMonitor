@@ -3,8 +3,8 @@ package task
 import (
 	"errors"
 	"gitmonitor/constants"
-	"gitmonitor/db"
 	"gitmonitor/models"
+	"gitmonitor/sections/data"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -121,7 +121,7 @@ func validateTask(task models.Task) bool {
 		task.Name != "" && task.ProjectId != 0
 }
 
-func showModifyTaskWindow(selectedTask models.Task, db *db.DBConfig) {
+func showModifyTaskWindow(selectedTask models.Task, appData *data.AppData) {
 	w := fyne.CurrentApp().NewWindow("Edit a task")
 	// TODO
 	w.CenterOnScreen()
@@ -129,7 +129,7 @@ func showModifyTaskWindow(selectedTask models.Task, db *db.DBConfig) {
 	w.Show()
 }
 
-func showTaskWindow(taskWrapper fyne.CanvasObject, taskData TaskData, db *db.DBConfig) {
+func showTaskWindow(taskWrapper fyne.CanvasObject, taskData TaskData, appData *data.AppData) {
 	w := fyne.CurrentApp().NewWindow("Add a new task")
 
 	data := &formData{
@@ -155,7 +155,7 @@ func showTaskWindow(taskWrapper fyne.CanvasObject, taskData TaskData, db *db.DBC
 			data.task.EndDate = endDate.Unix()
 
 			// Get branch id for selected branch
-			data.task.BranchId = db.GetBranchIdByName(data.tempBranch)
+			data.task.BranchId = appData.Database.GetBranchIdByName(data.tempBranch)
 			data.task.TaskStatus = int(constants.Waiting)
 			data.task.ProjectId = taskData.Project.ProjectId
 
@@ -165,14 +165,14 @@ func showTaskWindow(taskWrapper fyne.CanvasObject, taskData TaskData, db *db.DBC
 				return
 			}
 
-			err = db.AddTask(data.task)
+			err = appData.Database.AddTask(data.task)
 			if err != nil {
 				dialog.ShowError(err, w)
 				return
 			}
 
 			// Re-render task
-			RenderTaskTab(taskWrapper, taskData, db)
+			RenderTaskTab(taskWrapper, taskData, appData)
 
 			dialog.ShowInformation("Success", "Task was successfully added", w)
 			w.Close()

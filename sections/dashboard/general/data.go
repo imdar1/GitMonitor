@@ -2,8 +2,7 @@ package general
 
 import (
 	"fmt"
-	"gitmonitor/models"
-	"gitmonitor/services/git"
+	"gitmonitor/sections/data"
 	"gitmonitor/services/utils"
 	"path"
 	"regexp"
@@ -43,9 +42,9 @@ func getLinesOfCodeInformation(fileInformation FileInformation, paths []string) 
 	fileInformation.TotalBlanks.Set(fmt.Sprintf("%d lines", int(result.Total.Blanks)))
 }
 
-func InitGeneralData(project models.Project, r git.GitConfig) GeneralData {
+func InitGeneralData(appData *data.AppData) GeneralData {
 	var data GeneralData
-	data.OriginUrl = r.GetOriginUrl()
+	data.OriginUrl = appData.Repo.GetOriginUrl()
 	baseName := path.Base(data.OriginUrl)
 	re := regexp.MustCompile(`^(.+)\.git$`)
 	match := re.FindStringSubmatch(baseName)
@@ -55,7 +54,7 @@ func InitGeneralData(project models.Project, r git.GitConfig) GeneralData {
 		data.ProjectName = baseName
 	}
 
-	commits, err := r.GetCommitObjects()
+	commits, err := appData.Repo.GetCommitObjects()
 	if err == nil {
 		data.Commits = commits
 	} else {
@@ -68,7 +67,7 @@ func InitGeneralData(project models.Project, r git.GitConfig) GeneralData {
 		data.RepoStartDate = "No date"
 	}
 
-	data.ProjectDir = project.ProjectDir
+	data.ProjectDir = appData.SelectedProject.ProjectDir
 	data.FileInformation = FileInformation{
 		TotalFiles:    binding.NewString(),
 		TotalCode:     binding.NewString(),

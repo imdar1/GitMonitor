@@ -1,10 +1,9 @@
 package task
 
 import (
-	"gitmonitor/db"
 	"gitmonitor/models"
 	"gitmonitor/sections/auth"
-	"gitmonitor/services/git"
+	"gitmonitor/sections/data"
 	"gitmonitor/services/utils"
 )
 
@@ -14,28 +13,35 @@ type TaskData struct {
 	Branches []models.Branch
 }
 
-func (t *TaskData) ReadTaskData(gitConfig git.GitConfig, db db.DBConfig) {
-	const serviceName = "ReadTaskData"
+func InitReadTaskData(appData *data.AppData) TaskData {
+	const serviceName = "InitReadTaskData"
 	// Initialize tasks list
-	tasks := db.GetTasksData(t.Project.ProjectId)
+	tasks := appData.Database.GetTasksData(appData.SelectedProject.ProjectId)
 
 	// get remote branches and sync branches with db
-	branches, err := gitConfig.GetRemoteBranches(auth.AskAuth)
+	branches, err := appData.Repo.GetRemoteBranches(auth.AskAuth)
 	utils.CheckErr(serviceName, err)
-	err = db.SyncBranches(t.Project.ProjectId, branches)
+	err = appData.Database.SyncBranches(appData.SelectedProject.ProjectId, branches)
 	utils.CheckErr(serviceName, err)
 
 	// get branches stored in db
-	branchModels, err := db.GetBranchesData(t.Project.ProjectId)
+	branchModels, err := appData.Database.GetBranchesData(appData.SelectedProject.ProjectId)
 	utils.CheckErr(serviceName, err)
 
 	// sync task and branch in db
-	err = db.SyncTask(tasks, branchModels)
+	err = appData.Database.SyncTask(tasks, branchModels)
 	utils.CheckErr(serviceName, err)
 
 	// get updated tasks
-	tasks = db.GetTasksData(t.Project.ProjectId)
+	tasks = appData.Database.GetTasksData(appData.SelectedProject.ProjectId)
 
-	t.Tasks = tasks
-	t.Branches = branchModels
+	return TaskData{
+		Project:  appData.SelectedProject,
+		Tasks:    tasks,
+		Branches: branchModels,
+	}
+}
+
+func (t *TaskData) RefreshTaskData(appData *data.AppData) {
+
 }

@@ -5,6 +5,7 @@ import (
 	"gitmonitor/sections/dashboard/contribution"
 	"gitmonitor/sections/dashboard/general"
 	"gitmonitor/sections/dashboard/task"
+	"gitmonitor/sections/data"
 	"gitmonitor/services/utils"
 
 	"fyne.io/fyne/v2"
@@ -17,26 +18,23 @@ type TabItemsState struct {
 	ContributionContent fyne.CanvasObject
 }
 
-func (tabState *TabItemsState) OnWindowLoaded(appData *AppData) {
+func (tabState *TabItemsState) OnWindowLoaded(appData *data.AppData) {
 
 }
 
-func (tabState *TabItemsState) OnRepositoryLoaded(appData *AppData) {
+func (tabState *TabItemsState) OnRepositoryLoaded(appData *data.AppData) {
 	// Fetch and checkout
 	err := appData.Repo.FetchAndCheckout(auth.AskAuth)
 	utils.CheckErr("OnRepositoryLoaded", err)
 
 	// Update task content
 	taskContent := tabState.TaskContent.(*widget.Card)
-	taskData := task.TaskData{
-		Project: appData.SelectedProject,
-	}
-	taskData.ReadTaskData(appData.Repo, *appData.Database)
-	task.RenderTaskTab(taskContent, taskData, appData.Database)
+	taskData := task.InitReadTaskData(appData)
+	task.RenderTaskTab(taskContent, taskData, appData)
 
 	// Update general content
 	generalContent := tabState.GeneralContent.(*widget.Card)
-	generalData := general.InitGeneralData(appData.SelectedProject, appData.Repo)
+	generalData := general.InitGeneralData(appData)
 	general.RenderGeneralTab(generalContent, generalData)
 
 	// Update contributor content
