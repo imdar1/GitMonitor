@@ -172,6 +172,7 @@ func showTaskWindow(taskWrapper fyne.CanvasObject, taskData TaskData, appData *d
 			}
 
 			// Re-render task
+			taskData.RefreshTasksFromTaskData(appData)
 			RenderTaskTab(taskWrapper, taskData, appData)
 
 			dialog.ShowInformation("Success", "Task was successfully added", w)

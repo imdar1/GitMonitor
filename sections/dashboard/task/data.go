@@ -42,6 +42,6 @@ func InitReadTaskData(appData *data.AppData) TaskData {
 	}
 }
 
-func (t *TaskData) RefreshTaskData(appData *data.AppData) {
-
+func (t *TaskData) RefreshTasksFromTaskData(appData *data.AppData) {
+	t.Tasks = appData.Database.GetTasksData(t.Project.ProjectId)
 }
