@@ -68,8 +68,71 @@ func (db *DBConfig) AddTask(task models.Task) error {
 	return err
 }
 
+func (db *DBConfig) DeleteTask(task models.Task) error {
+	const serviceName = "DeleteTask"
+	tx, err := db.Driver.Begin()
+	if err != nil {
+		utils.CheckErr(serviceName, err)
+		return err
+	}
+	queryTemplate := "DELETE FROM task WHERE task_id=%d"
+	query := fmt.Sprintf(queryTemplate, task.TaskId)
+	_, err = tx.Exec(query)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	return tx.Commit()
+}
+
 func (db *DBConfig) UpdateTask(task models.Task) error {
-	return nil
+	const serviceName = "UpdateTask"
+	tx, err := db.Driver.Begin()
+	if err != nil {
+		utils.CheckErr(serviceName, err)
+		return err
+	}
+	queryTemplate := `UPDATE task SET 
+						branch_id=%d,
+						name=%s,
+						assignee_name=%s,
+						assignee_email=%s,
+						task_status=%d,
+						start_date=%ld,
+						end_date=%ld WHERE task_id=%d`
+	query := fmt.Sprintf(
+		queryTemplate,
+		task.BranchId,
+		task.Name,
+		task.AssigneeName,
+		task.AssigneeEmail,
+		task.TaskStatus,
+		task.StartDate,
+		task.EndDate,
+		task.TaskId,
+	)
+	_, err = tx.Exec(query)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	return tx.Commit()
+}
+
+func (db *DBConfig) UpdateTaskStatus(task models.Task, status constants.TaskStatus) error {
+	const serviceName = "UpdateTaskStatus"
+	tx, err := db.Driver.Begin()
+	if err != nil {
+		utils.CheckErr(serviceName, err)
+		return err
+	}
+	queryTemplate := "UPDATE task SET task_status=%d WHERE task_id=%d"
+	_, err = tx.Exec(fmt.Sprintf(queryTemplate, status, task.TaskId))
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	return tx.Commit()
 }
 
 func getBranchIdList(branches []models.Branch) []int {
@@ -80,7 +143,7 @@ func getBranchIdList(branches []models.Branch) []int {
 	return branchIdList
 }
 
-func (db *DBConfig) taskStatusIsInProgress(branchId int) bool {
+func (db *DBConfig) isTaskStatusInProgress(branchId int) bool {
 	var taskStatus int
 	const serviceName = "taskStatusIsInProgress"
 	query := fmt.Sprintf("SELECT task_status FROM task WHERE branch_id=%d", branchId)
@@ -111,7 +174,7 @@ func (db *DBConfig) SyncTask(tasks []models.Task, branches []models.Branch) erro
 				return err
 			}
 		} else {
-			if db.taskStatusIsInProgress(v.BranchId) {
+			if db.isTaskStatusInProgress(v.BranchId) {
 				query := fmt.Sprintf(queryTemplate, constants.Done, v.BranchId)
 				_, err := tx.Exec(query)
 				if err != nil {

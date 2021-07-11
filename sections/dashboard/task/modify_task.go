@@ -90,6 +90,12 @@ func getTaskForm(data *formData, onSubmit func(), onClose func()) fyne.CanvasObj
 		data.tempBranch = s
 	}
 
+	taskStatusEntry := widget.NewSelect(constants.TaskStatusList, func(s string) {})
+	taskStatusEntry.SetSelectedIndex(data.task.TaskStatus)
+	taskStatusEntry.OnChanged = func(s string) {
+		data.task.TaskStatus = taskStatusEntry.SelectedIndex()
+	}
+
 	form := &widget.Form{
 		Items: []*widget.FormItem{
 			{Text: "Name", Widget: taskNameEntry},
@@ -97,6 +103,7 @@ func getTaskForm(data *formData, onSubmit func(), onClose func()) fyne.CanvasObj
 			{Text: "End date", Widget: taskEndDateEntry},
 			{Text: "Assignee", Widget: taskAssigneeNameEntry},
 			{Text: "Assignee mail", Widget: taskAssigneeEmailEntry},
+			{Text: "Status:", Widget: taskStatusEntry},
 			{Text: "Associated branch:", Widget: taskBranchEntry},
 		},
 	}
@@ -121,15 +128,81 @@ func validateTask(task models.Task) bool {
 		task.Name != "" && task.ProjectId != 0
 }
 
-func showModifyTaskWindow(selectedTask models.Task, appData *data.AppData) {
+// Convert string date with "DD/MM/YYYY" format into unix timestamp
+func getUnixTimeStampFromString(timeString string) (int64, error) {
+	date, err := time.Parse("02/01/2006", timeString)
+	if err != nil {
+		return 0, err
+	}
+	return date.Unix(), nil
+}
+
+func showModifyTaskWindow(
+	taskWrapper fyne.CanvasObject,
+	selectedTask models.Task,
+	taskData TaskData,
+	appData *data.AppData,
+) {
 	w := fyne.CurrentApp().NewWindow("Edit a task")
 	// TODO
+	data := &formData{
+		projectId: taskData.Project.ProjectId,
+		task:      selectedTask,
+		branches:  taskData.Branches,
+	}
+	taskForm := getTaskForm(
+		data,
+		func() {
+			// Validate start date and end date, then assign both to data
+			startDate, err := getUnixTimeStampFromString(data.tempStartDate)
+			if err != nil {
+				dialog.ShowError(err, w)
+				return
+			}
+			endDate, err := getUnixTimeStampFromString(data.tempEndDate)
+			if err != nil {
+				dialog.ShowError(err, w)
+				return
+			}
+			data.task.StartDate = startDate
+			data.task.EndDate = endDate
+
+			// Get branch id for selected branch
+			data.task.BranchId = appData.Database.GetBranchIdByName(data.tempBranch)
+			data.task.ProjectId = taskData.Project.ProjectId
+			// data.task.TaskStatus = int(constants.Waiting)
+
+			isValid := validateTask(data.task)
+			if !isValid {
+				dialog.ShowError(errors.New("invalid data"), w)
+				return
+			}
+
+			err = appData.Database.UpdateTask(data.task)
+			if err != nil {
+				dialog.ShowError(err, w)
+				return
+			}
+
+			// Re-render task
+			taskData.RefreshTasksFromTaskData(appData)
+			RenderTaskTab(taskWrapper, taskData, appData)
+
+			dialog.ShowInformation("Success", "Task was successfully updated", w)
+			w.Close()
+		},
+		func() {
+			w.Close()
+		},
+	)
+	wrapper := widget.NewCard("", "", taskForm)
+	w.SetContent(wrapper)
 	w.CenterOnScreen()
 	w.Resize(fyne.NewSize(400, 300))
 	w.Show()
 }
 
-func showTaskWindow(taskWrapper fyne.CanvasObject, taskData TaskData, appData *data.AppData) {
+func showAddTaskWindow(taskWrapper fyne.CanvasObject, taskData TaskData, appData *data.AppData) {
 	w := fyne.CurrentApp().NewWindow("Add a new task")
 
 	data := &formData{
@@ -141,23 +214,23 @@ func showTaskWindow(taskWrapper fyne.CanvasObject, taskData TaskData, appData *d
 		data,
 		func() {
 			// Validate start date and end date, then assign both to data
-			startDate, err := time.Parse("02/01/2006", data.tempStartDate)
+			startDate, err := getUnixTimeStampFromString(data.tempStartDate)
 			if err != nil {
 				dialog.ShowError(err, w)
 				return
 			}
-			endDate, err := time.Parse("02/01/2006", data.tempEndDate)
+			endDate, err := getUnixTimeStampFromString(data.tempEndDate)
 			if err != nil {
 				dialog.ShowError(err, w)
 				return
 			}
-			data.task.StartDate = startDate.Unix()
-			data.task.EndDate = endDate.Unix()
+			data.task.StartDate = startDate
+			data.task.EndDate = endDate
 
 			// Get branch id for selected branch
 			data.task.BranchId = appData.Database.GetBranchIdByName(data.tempBranch)
-			data.task.TaskStatus = int(constants.Waiting)
 			data.task.ProjectId = taskData.Project.ProjectId
+			// data.task.TaskStatus = int(constants.Waiting)
 
 			isValid := validateTask(data.task)
 			if !isValid {

@@ -43,15 +43,20 @@ const (
 	Waiting    TaskStatus = 0
 	InProgress TaskStatus = 1
 	Done       TaskStatus = 2
-	Expired    TaskStatus = 3
+	// Expired    TaskStatus = 3
 )
 
 var (
+	TaskStatusList = []string{
+		"Waiting",
+		"In progress",
+		"Done (Associated branch already deleted)",
+	}
 	TaskStatusMap = map[int]string{
-		0: "Waiting",
-		1: "In progress",
-		2: "Done (Associated branch already deleted)",
-		3: "Expired",
+		0: TaskStatusList[0],
+		1: TaskStatusList[1],
+		2: TaskStatusList[2],
+		// 3: "Expired",
 	}
 )
 

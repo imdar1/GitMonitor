@@ -86,7 +86,7 @@ func getTaskDetailCanvas(selectedTask models.Task, selectedBranch models.Branch)
 	return form
 }
 
-/* Render task to taskWrapper from given taskData and other operations needed to perform from db */
+// Render task to taskWrapper from given taskData and other operations needed to perform from db
 func RenderTaskTab(taskWrapper fyne.CanvasObject, taskData TaskData, appData *data.AppData) {
 	timeData := initData(taskData)
 	svgString := timeData.getGanttChartImage()
@@ -115,10 +115,10 @@ func RenderTaskTab(taskWrapper fyne.CanvasObject, taskData TaskData, appData *da
 	)
 	taskContent := container.NewVSplit(taskContentTop, taskContentBottom)
 	addTaskButton := widget.NewButton("Add Task", func() {
-		showTaskWindow(taskWrapperCard, taskData, appData)
+		showAddTaskWindow(taskWrapperCard, taskData, appData)
 	})
 
-	setBranchButton := widget.NewButton("Edit Task", func() {
+	editTaskButton := widget.NewButton("Edit Task", func() {
 		// get Task index from selected task
 		taskIndex, err := selectedTaskIndex.Get()
 		if err != nil || taskIndex == -1 {
@@ -127,10 +127,42 @@ func RenderTaskTab(taskWrapper fyne.CanvasObject, taskData TaskData, appData *da
 		}
 
 		selectedTask := taskData.Tasks[taskIndex]
-		// showTaskWindow(taskWrapperCard, tas)
-		showModifyTaskWindow(selectedTask, appData)
+		showModifyTaskWindow(taskWrapper, selectedTask, taskData, appData)
 	})
-	actionButton := container.NewHBox(layout.NewSpacer(), addTaskButton, setBranchButton)
+
+	deleteTaskButton := widget.NewButton("Delete Task", func() {
+		// get Task index from selected task
+		taskIndex, err := selectedTaskIndex.Get()
+		if err != nil || taskIndex == -1 {
+			dialog.ShowError(errors.New("please select a valid task"), fyne.CurrentApp().Driver().AllWindows()[0])
+			return
+		}
+
+		selectedTask := taskData.Tasks[taskIndex]
+		dialog.ShowConfirm(
+			"Confirm Deleting a Task",
+			"The current selected task is: "+selectedTask.Name+
+				"Are you sure you want to delete the selected text?",
+			func(isOk bool) {
+				if isOk {
+					err = appData.Database.DeleteTask(selectedTask)
+					if err != nil {
+						dialog.ShowError(
+							errors.New("error when deleting task: "+err.Error()),
+							fyne.CurrentApp().Driver().AllWindows()[0],
+						)
+					}
+
+					// Re-render task tab
+					taskData.RefreshTasksFromTaskData(appData)
+					RenderTaskTab(taskWrapper, taskData, appData)
+				}
+			},
+			fyne.CurrentApp().Driver().AllWindows()[0],
+		)
+	})
+
+	actionButton := container.NewHBox(layout.NewSpacer(), addTaskButton, editTaskButton, deleteTaskButton)
 	taskContentWrapper := container.NewBorder(nil, actionButton, nil, nil, taskContent)
 
 	taskWrapperCard.SetContent(taskContentWrapper)
