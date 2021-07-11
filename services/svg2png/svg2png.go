@@ -24,14 +24,21 @@ func elementScreenshot(html, sel string, res *[]byte) chromedp.Tasks {
 			return nil
 
 		}),
-		chromedp.Screenshot(sel, res, chromedp.NodeVisible),
+		chromedp.Screenshot(sel, res, chromedp.NodeVisible, chromedp.ByQuery),
+		// chromedp.FullScreenshot(res, 100),
+		// chromedp.Screenshot()
 	}
 }
 
 func GetImage(svg string) []byte {
-	ctx, cancel := chromedp.NewContext(
-		context.Background(),
-	)
+	allocContext, cancel := chromedp.NewExecAllocator(context.Background(), append(
+		chromedp.DefaultExecAllocatorOptions[:],
+		chromedp.Flag("headless", true),
+		chromedp.WindowSize(1920, 1080),
+	)...)
+	defer cancel()
+
+	ctx, cancel := chromedp.NewContext(allocContext)
 	defer cancel()
 
 	var buf []byte
