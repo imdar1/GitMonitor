@@ -2,6 +2,7 @@ package task
 
 import (
 	"errors"
+	"fmt"
 	"gitmonitor/constants"
 	"gitmonitor/models"
 	"gitmonitor/sections/data"
@@ -52,8 +53,10 @@ func getTaskForm(data *formData, onSubmit func(), onClose func()) fyne.CanvasObj
 
 	taskStartDateEntry := widget.NewEntry()
 	taskStartDateEntry.SetPlaceHolder("DD/MM/YYYY format")
+	tempStartDate := time.Unix(data.task.StartDate, 0).Format("02/01/2006")
+	data.tempStartDate = tempStartDate
 	if data.task.StartDate > 0 {
-		taskStartDateEntry.SetText(time.Unix(data.task.StartDate, 0).Format("02/01/2006"))
+		taskStartDateEntry.SetText(tempStartDate)
 	}
 	taskStartDateEntry.OnChanged = func(s string) {
 		data.tempStartDate = s
@@ -61,8 +64,10 @@ func getTaskForm(data *formData, onSubmit func(), onClose func()) fyne.CanvasObj
 
 	taskEndDateEntry := widget.NewEntry()
 	taskEndDateEntry.SetPlaceHolder("DD/MM/YYYY format")
+	tempEndDate := time.Unix(data.task.EndDate, 0).Format("02/01/2006")
+	data.tempEndDate = tempEndDate
 	if data.task.EndDate > 0 {
-		taskEndDateEntry.SetText(time.Unix(data.task.EndDate, 0).Format("02/01/2006"))
+		taskEndDateEntry.SetText(tempEndDate)
 	}
 	taskEndDateEntry.OnChanged = func(s string) {
 		data.tempEndDate = s
@@ -84,7 +89,9 @@ func getTaskForm(data *formData, onSubmit func(), onClose func()) fyne.CanvasObj
 
 	branchesName := getBranchesName(data.branches)
 	taskBranchEntry := widget.NewSelectEntry(branchesName) // TODO: read branches from db
-	taskBranchEntry.SetText(getBranchName(data.task.BranchId, data.branches))
+	tempBranch := getBranchName(data.task.BranchId, data.branches)
+	data.tempBranch = tempBranch
+	taskBranchEntry.SetText(tempBranch)
 	taskBranchEntry.SetPlaceHolder("Feature branch to work on this task")
 	taskBranchEntry.OnChanged = func(s string) {
 		data.tempBranch = s
@@ -180,6 +187,7 @@ func showModifyTaskWindow(
 
 			err = appData.Database.UpdateTask(data.task)
 			if err != nil {
+				fmt.Println(err.Error())
 				dialog.ShowError(err, w)
 				return
 			}

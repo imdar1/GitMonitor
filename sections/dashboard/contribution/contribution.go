@@ -2,16 +2,10 @@ package contribution
 
 import (
 	"fmt"
-	"gitmonitor/services/git"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/widget"
 )
-
-type authorTable struct {
-	git.Author
-	git.AuthorInfo
-}
 
 func InitContributionTab() fyne.CanvasObject {
 	return widget.NewLabel("Contribution Information")

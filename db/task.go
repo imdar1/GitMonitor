@@ -94,12 +94,12 @@ func (db *DBConfig) UpdateTask(task models.Task) error {
 	}
 	queryTemplate := `UPDATE task SET 
 						branch_id=%d,
-						name=%s,
-						assignee_name=%s,
-						assignee_email=%s,
+						name='%s',
+						assignee_name='%s',
+						assignee_email='%s',
 						task_status=%d,
-						start_date=%ld,
-						end_date=%ld WHERE task_id=%d`
+						start_date=%d,
+						end_date=%d WHERE task_id=%d`
 	query := fmt.Sprintf(
 		queryTemplate,
 		task.BranchId,
@@ -113,6 +113,7 @@ func (db *DBConfig) UpdateTask(task models.Task) error {
 	)
 	_, err = tx.Exec(query)
 	if err != nil {
+		utils.CheckErr(serviceName, fmt.Errorf(fmt.Sprintf("error message: %s with query: %s", err, query)))
 		tx.Rollback()
 		return err
 	}

@@ -2,6 +2,7 @@ package task
 
 import (
 	"bytes"
+	"gitmonitor/constants"
 	"gitmonitor/services/svg2png"
 	"gitmonitor/services/utils"
 	"time"
@@ -13,6 +14,7 @@ import (
 type taskInformation struct {
 	taskName     string
 	startDateStr string
+	taskStatus   constants.TaskStatus
 	days         int
 }
 
@@ -54,6 +56,7 @@ func initData(taskData TaskData) timelineData {
 				startDateStr: utils.GetStringFromDatetime(startTask),
 				days:         utils.GetDayDifference(startTask, endTask),
 				taskName:     v.Name,
+				taskStatus:   constants.TaskStatus(v.TaskStatus),
 			}
 			data.tasks = append(data.tasks, taskInfo)
 		}
@@ -66,9 +69,19 @@ func (t *timelineData) getGanttChartImage() []byte {
 		return []byte{}
 	}
 
+	var bar *design.Task
 	ganttChart := design.NewGanttChart(date.String(t.startDateStr), t.days+1)
 	for _, value := range t.tasks {
-		bar := ganttChart.Add(value.taskName)
+		switch value.taskStatus {
+		case constants.Waiting:
+			bar = ganttChart.Add(value.taskName).Blue()
+		case constants.InProgress:
+			bar = ganttChart.Add(value.taskName).Red()
+		case constants.Done:
+			bar = ganttChart.Add(value.taskName)
+		default:
+			bar = ganttChart.Add(value.taskName)
+		}
 		ganttChart.Place(bar).At(date.String(value.startDateStr), value.days)
 	}
 

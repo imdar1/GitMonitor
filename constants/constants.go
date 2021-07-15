@@ -50,7 +50,7 @@ var (
 	TaskStatusList = []string{
 		"Waiting",
 		"In progress",
-		"Done (Associated branch already deleted)",
+		"Done",
 	}
 	TaskStatusMap = map[int]string{
 		0: TaskStatusList[0],

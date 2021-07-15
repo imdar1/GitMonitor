@@ -7,6 +7,11 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
+type authorTable struct {
+	git.Author
+	git.AuthorInfo
+}
+
 type ContributorData struct {
 	authorMap map[git.Author]git.AuthorInfo
 }
