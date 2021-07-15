@@ -1,0 +1,41 @@
+@startuml
+top to bottom direction
+skinparam classAttributeIconSize 0
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 14
+skinparam monochrome true
+hide circle
+
+namespace git {
+    top to bottom direction
+    class Author << (S,Aquamarine) >> {
+        + Name string
+        + Email string
+
+    }
+    class AuthorInfo << (S,Aquamarine) >> {
+        + TotalCommit int
+        + LastCommit time.Time
+        + FirstCommit time.Time
+
+    }
+    class GitConfig << (S,Aquamarine) >> {
+        - repo *git.Repository
+        - auth transport.AuthMethod
+
+        + GetBranchList() : []string
+        + GetRemoteBranches(<font color=blue>func</font>() transport.AuthMethod) : ([]string, error)
+        + GetAuthorInfoByAuthor([]*object.Commit) : (<font color=blue>map</font>[Author]AuthorInfo, error)
+        + FetchAndCheckout(<font color=blue>func</font>() transport.AuthMethod) : error
+        + GetOriginUrl() : string
+        + GetPaths() : ([]string, error)
+        + GetCommitObjects() : ([]*object.Commit, error)
+
+    }
+}
+
+"git.GitConfig" -[hidden]- "git.Author"
+"git.GitConfig" -[hidden]- "git.AuthorInfo"
+
+ 
+@enduml

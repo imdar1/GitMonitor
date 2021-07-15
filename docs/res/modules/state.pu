@@ -1,0 +1,52 @@
+@startuml
+
+top to bottom direction
+skinparam monochrome true
+skinparam classAttributeIconSize 0
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 14
+hide circle
+
+namespace state {
+    class AppState << (S,Aquamarine) >> {
+        + ProfileState ProfileState
+        + DashboardState TabItemsState
+
+        + OnWindowLoaded() 
+        + OnRepositoryLoaded() 
+
+    }
+    class ProfileState << (S,Aquamarine) >> {
+        - projects []models.Project
+
+        + ProjectEntry *widget.SelectEntry
+
+        + OnWindowLoaded(appData *data.AppData) 
+        + OnRepositoryLoaded(appData *data.AppData) 
+
+    }
+    class TabItemsState << (S,Aquamarine) >> {
+        + GeneralContent fyne.CanvasObject
+        + TaskContent fyne.CanvasObject
+        + ContributionContent fyne.CanvasObject
+
+        + OnWindowLoaded(appData *data.AppData) 
+        + OnRepositoryLoaded(appData *data.AppData) 
+
+    }
+}
+
+"state.AppState" o-u- "state.ProfileState"
+"state.AppState" o-u- "state.TabItemsState"
+"data.AppData" *-u- "state.AppState"
+
+namespace data {
+    class AppData << (S,Aquamarine) >> {
+        + Repo git.GitConfig
+        + Database *db.DBConfig
+        + SelectedProject models.Project
+
+    }
+}
+
+@enduml

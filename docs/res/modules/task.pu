@@ -1,0 +1,43 @@
+@startuml
+top to bottom direction
+skinparam classAttributeIconSize 0
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 14
+skinparam monochrome true
+hide circle
+
+namespace task {
+    class TaskData << (S,Aquamarine) >> {
+        + Project models.Project
+        + Tasks []models.Task
+        + Branches []models.Branch
+
+        + RefreshTasksFromTaskData(appData *data.AppData) 
+
+    }
+    class formData << (S,Aquamarine) >> {
+        - projectId int64
+        - tempStartDate string
+        - tempEndDate string
+        - tempBranch string
+        - task models.Task
+        - branches []models.Branch
+
+    }
+    class taskInformation << (S,Aquamarine) >> {
+        - taskName string
+        - startDateStr string
+        - days int
+
+    }
+    class timelineData << (S,Aquamarine) >> {
+        - startDateStr string
+        - days int
+        - tasks []taskInformation
+
+        - getGanttChartImage() : []byte
+
+    }
+}
+
+@enduml

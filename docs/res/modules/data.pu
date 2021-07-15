@@ -1,0 +1,17 @@
+@startuml
+top to bottom direction
+skinparam classAttributeIconSize 0
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 14
+skinparam monochrome true
+hide circle
+
+namespace data {
+    class AppData << (S,Aquamarine) >> {
+        + Repo git.GitConfig
+        + Database *db.DBConfig
+        + SelectedProject models.Project
+    }
+}
+
+@enduml

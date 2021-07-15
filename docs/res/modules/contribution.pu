@@ -1,0 +1,35 @@
+@startuml
+top to bottom direction
+skinparam classAttributeIconSize 0
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 14
+skinparam monochrome true
+hide circle
+
+namespace contribution {
+    class ContributorData << (S,Aquamarine) >> {
+        - authorMap <font color=blue>map</font>[git.Author]git.AuthorInfo
+
+    }
+    class authorTable << (S,Aquamarine) >> {
+    }
+}
+"git.Author" *-- "contribution.authorTable"
+"git.AuthorInfo" *-- "contribution.authorTable"
+
+namespace git {
+    top to bottom direction
+    class Author << (S,Aquamarine) >> {
+        + Name string
+        + Email string
+
+    }
+    class AuthorInfo << (S,Aquamarine) >> {
+        + TotalCommit int
+        + LastCommit time.Time
+        + FirstCommit time.Time
+
+    }
+}
+
+@enduml

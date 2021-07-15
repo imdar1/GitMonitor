@@ -1,0 +1,28 @@
+@startuml
+top to bottom direction
+skinparam classAttributeIconSize 0
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 14
+skinparam monochrome true
+hide circle
+
+namespace general {
+    class FileInformation << (S,Aquamarine) >> {
+        + TotalFiles string
+        + TotalCode string
+        + TotalComments string
+        + TotalBlanks string
+
+    }
+    class GeneralData << (S,Aquamarine) >> {
+        + ProjectDir string
+        + OriginUrl string
+        + ProjectName string
+        + RepoStartDate string
+        + Commits []*object.Commit
+
+    }
+}
+"general.FileInformation" *-- "general.GeneralData"
+
+@enduml
