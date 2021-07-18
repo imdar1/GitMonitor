@@ -24,25 +24,6 @@ type formData struct {
 	branches      []models.Branch
 }
 
-func getBranchesName(branches []models.Branch) []string {
-	var branchesName []string
-	for _, v := range branches {
-		branchesName = append(branchesName, v.Name)
-	}
-	return branchesName
-}
-
-func getBranchName(branchId int, branches []models.Branch) string {
-	name := ""
-	for _, v := range branches {
-		if v.BranchId == branchId {
-			name = v.Name
-			break
-		}
-	}
-	return name
-}
-
 func getTaskForm(data *formData, onSubmit func(), onClose func()) fyne.CanvasObject {
 	taskNameEntry := widget.NewEntry()
 	taskNameEntry.SetText(data.task.Name)
@@ -87,9 +68,9 @@ func getTaskForm(data *formData, onSubmit func(), onClose func()) fyne.CanvasObj
 		data.task.AssigneeEmail = s
 	}
 
-	branchesName := getBranchesName(data.branches)
+	branchesName := models.GetBranchesName(data.branches)
 	taskBranchEntry := widget.NewSelectEntry(branchesName) // TODO: read branches from db
-	tempBranch := getBranchName(data.task.BranchId, data.branches)
+	tempBranch := models.GetBranchName(data.task.BranchId, data.branches)
 	data.tempBranch = tempBranch
 	taskBranchEntry.SetText(tempBranch)
 	taskBranchEntry.SetPlaceHolder("Feature branch to work on this task")

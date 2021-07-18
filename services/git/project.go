@@ -9,16 +9,27 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/transport"
 )
 
-func (r *GitConfig) FetchAndCheckout(askAuth func() transport.AuthMethod) error {
+func (r *GitConfig) FetchAndCheckout(
+	askAuth func() transport.AuthMethod,
+	defaultBranchName string,
+	defaultRemoteName string,
+) error {
 	const serviceName = "FetchAndCheckout"
 
 	// Fetch remote repository
-	err := r.repo.Fetch(&git.FetchOptions{})
+	err := r.repo.Fetch(&git.FetchOptions{
+		RemoteName: defaultRemoteName,
+	})
 	if err == transport.ErrAuthenticationRequired {
 		r.auth = askAuth()
 		err = r.repo.Fetch(&git.FetchOptions{
-			Auth: r.auth,
+			RemoteName: defaultRemoteName,
+			Auth:       r.auth,
 		})
+		if err != nil {
+			utils.CheckErr(serviceName, err)
+			return err
+		}
 	}
 
 	w, err := r.repo.Worktree()
@@ -26,7 +37,7 @@ func (r *GitConfig) FetchAndCheckout(askAuth func() transport.AuthMethod) error 
 
 	// Checking out to origin/master
 	return w.Checkout(&git.CheckoutOptions{
-		Branch: plumbing.NewRemoteHEADReferenceName("origin"),
+		Branch: plumbing.NewBranchReferenceName(defaultBranchName),
 		Keep:   true,
 	})
 

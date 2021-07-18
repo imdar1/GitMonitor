@@ -4,6 +4,7 @@ import (
 	"gitmonitor/sections/auth"
 	"gitmonitor/sections/dashboard/contribution"
 	"gitmonitor/sections/dashboard/general"
+	"gitmonitor/sections/dashboard/settings"
 	"gitmonitor/sections/dashboard/task"
 	"gitmonitor/sections/data"
 	"gitmonitor/services/utils"
@@ -16,6 +17,7 @@ type TabItemsState struct {
 	GeneralContent      fyne.CanvasObject
 	TaskContent         fyne.CanvasObject
 	ContributionContent fyne.CanvasObject
+	SettingsContent     fyne.CanvasObject
 }
 
 func (tabState *TabItemsState) OnWindowLoaded(appData *data.AppData) {
@@ -24,7 +26,11 @@ func (tabState *TabItemsState) OnWindowLoaded(appData *data.AppData) {
 
 func (tabState *TabItemsState) OnRepositoryLoaded(appData *data.AppData) {
 	// Fetch and checkout
-	err := appData.Repo.FetchAndCheckout(auth.AskAuth)
+	err := appData.Repo.FetchAndCheckout(
+		auth.AskAuth,
+		appData.SelectedProject.DefaultBranchName,
+		appData.SelectedProject.DefaultRemoteName,
+	)
 	utils.CheckErr("OnRepositoryLoaded", err)
 
 	// Update task content
@@ -41,6 +47,13 @@ func (tabState *TabItemsState) OnRepositoryLoaded(appData *data.AppData) {
 	contributionContent := tabState.ContributionContent.(*widget.Card)
 	contributionData := contribution.InitContributorData(generalData.Commits, appData.Repo)
 	contribution.RenderContributorTab(contributionContent, contributionData)
+
+	// Update settings tab
+	settingsContent := tabState.SettingsContent.(*widget.Card)
+	settingsData := settings.SettingsData{
+		RemoteBranches: taskData.Branches,
+	}
+	settings.RenderSettingsTab(settingsContent, settingsData, appData)
 }
 
 func InitTabItems() TabItemsState {
@@ -49,6 +62,7 @@ func InitTabItems() TabItemsState {
 		GeneralContent:      widget.NewCard("", "", general.InitGeneralTab()),
 		TaskContent:         widget.NewCard("", "", task.InitTaskTab()),
 		ContributionContent: widget.NewCard("", "", contribution.InitContributionTab()),
+		SettingsContent:     widget.NewCard("", "", settings.InitSettingsTab()),
 	}
 	return tabItems
 }

@@ -15,7 +15,12 @@ func (db *DBConfig) GetProjects() []models.Project {
 	if rows != nil {
 		for rows.Next() {
 			var project models.Project
-			err = rows.Scan(&project.ProjectId, &project.ProjectDir)
+			err = rows.Scan(
+				&project.ProjectId,
+				&project.ProjectDir,
+				&project.DefaultBranchName,
+				&project.DefaultRemoteName,
+			)
 			utils.CheckErr(serviceName, err)
 			projects = append(projects, project)
 		}
@@ -30,7 +35,12 @@ func (db *DBConfig) GetProjectByDir(dir string) models.Project {
 
 	query := fmt.Sprintf("SELECT * FROM project WHERE project_dir='%s' LIMIT 1;", dir)
 	rows := db.Driver.QueryRow(query)
-	err := rows.Scan(&project.ProjectId, &project.ProjectDir)
+	err := rows.Scan(
+		&project.ProjectId,
+		&project.ProjectDir,
+		&project.DefaultBranchName,
+		&project.DefaultRemoteName,
+	)
 	if err == sql.ErrNoRows {
 		project = models.Project{
 			ProjectDir: dir,
@@ -47,7 +57,11 @@ func (db *DBConfig) GetProjectByDir(dir string) models.Project {
 func (db *DBConfig) insertProject(p models.Project) int64 {
 	const serviceName = "insertProject"
 	dir := p.ProjectDir
-	insertQuery := fmt.Sprintf("INSERT INTO project(project_dir) VALUES('%s');", dir)
+	insertQuery := fmt.Sprintf(
+		`INSERT INTO project(project_dir, default_branch_name, default_remote_name) 
+			VALUES('%s', 'master', 'origin');`,
+		dir,
+	)
 	statement, err := db.Driver.Prepare(insertQuery)
 	utils.CheckErr(serviceName, err)
 

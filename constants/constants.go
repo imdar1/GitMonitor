@@ -4,7 +4,9 @@ const DB_DRIVER = "sqlite3"
 const DB_PATH = "./gitmonitor.db"
 const INIT_PROJECT_TABLE = `CREATE TABLE IF NOT EXISTS project(
 	"project_id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	"project_dir" TEXT
+	"project_dir" TEXT,
+	"default_branch_name" TEXT,
+	"default_remote_name" TEXT
 );`
 const INIT_BRANCH_TABLE = `CREATE TABLE IF NOT EXISTS branch(
 	"branch_id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
