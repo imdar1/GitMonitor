@@ -214,6 +214,7 @@ namespace task {
 "task.TaskData" -[hidden] "task.formData"
 "task.formData" -[hidden]- "task.taskInformation"
 "task.formData" -[hidden]- "task.timelineData"
+"task.taskInformation" -o "task.timelineData"
 
 "contribution.authorTable" -[hidden]- "general.FileInformation"
  
