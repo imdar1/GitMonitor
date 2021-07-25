@@ -72,3 +72,45 @@ func (db *DBConfig) insertProject(p models.Project) int64 {
 	utils.CheckErr(serviceName, err)
 	return id
 }
+
+func (db *DBConfig) UpdateDefaultRemoteName(remoteName string, projectId int64) error {
+	const serviceName = "UpdateRemoteName"
+	query := fmt.Sprintf(
+		"UPDATE project SET default_remote_name='%s' WHERE project_id=%d",
+		remoteName,
+		projectId,
+	)
+	tx, err := db.Driver.Begin()
+	if err != nil {
+		utils.CheckErr(serviceName, err)
+		return err
+	}
+	_, err = tx.Exec(query)
+	if err != nil {
+		tx.Rollback()
+		utils.CheckErr(serviceName, err)
+		return err
+	}
+	return nil
+}
+
+func (db *DBConfig) UpdateDefaultBranchName(branchName string, projectId int64) error {
+	const serviceName = "UpdateDefaultBranchName"
+	query := fmt.Sprintf(
+		"UPDATE project SET default_branch_name='%s' WHERE project_id=%d",
+		branchName,
+		projectId,
+	)
+	tx, err := db.Driver.Begin()
+	if err != nil {
+		utils.CheckErr(serviceName, err)
+		return err
+	}
+	_, err = tx.Exec(query)
+	if err != nil {
+		tx.Rollback()
+		utils.CheckErr(serviceName, err)
+		return err
+	}
+	return nil
+}
