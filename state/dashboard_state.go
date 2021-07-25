@@ -45,8 +45,13 @@ func (tabState *TabItemsState) OnRepositoryLoaded(appData *data.AppData) {
 
 	// Update contributor content
 	contributionContent := tabState.ContributionContent.(*widget.Card)
-	contributionData := contribution.InitContributorData(generalData.Commits, appData.Repo)
-	contribution.RenderContributorTab(contributionContent, contributionData)
+	contributionData := contribution.InitContributorData(
+		generalData.Commits,
+		taskData.Tasks,
+		appData.SelectedProject.DefaultBranchName,
+		appData.SelectedProject.DefaultRemoteName,
+	)
+	contribution.RenderContributorTab(contributionContent, contributionData, appData)
 
 	// Update settings tab
 	settingsContent := tabState.SettingsContent.(*widget.Card)

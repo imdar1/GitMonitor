@@ -2,16 +2,41 @@ package contribution
 
 import (
 	"fmt"
+	"gitmonitor/sections/data"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
+
+type authorTable struct {
+	Author
+	AuthorInfo
+}
 
 func InitContributionTab() fyne.CanvasObject {
 	return widget.NewLabel("Contribution Information")
 }
 
-func RenderContributorTab(wrapper fyne.CanvasObject, data ContributorData) {
+func getFeatureBranchesListCanvas(data ContributorData, appData *data.AppData) fyne.CanvasObject {
+	list := widget.NewList(
+		func() int {
+			return len(data.tasks)
+		},
+		func() fyne.CanvasObject {
+			return container.NewHBox(widget.NewIcon(theme.DocumentIcon()), widget.NewLabel("Feature branch name"))
+		},
+		func(id widget.ListItemID, item fyne.CanvasObject) {
+			branch := appData.Database.GetBranchById(data.tasks[id].BranchId)
+			item.(*fyne.Container).Objects[1].(*widget.Label).SetText(branch.Name)
+		},
+	)
+
+	return list
+}
+
+func RenderContributorTab(wrapper fyne.CanvasObject, data ContributorData, appData *data.AppData) {
 	authorList := []authorTable{}
 	for key, value := range data.authorMap {
 		authorList = append(authorList, authorTable{key, value})
@@ -76,6 +101,16 @@ func RenderContributorTab(wrapper fyne.CanvasObject, data ContributorData) {
 	for i := 0; i <= 4; i++ {
 		table.SetColumnWidth(i, 200)
 	}
+
+	featureContent := container.NewHSplit(
+		container.NewVScroll(getFeatureBranchesListCanvas(data, appData)),
+		container.NewVScroll(widget.NewCard(
+			"Nama task-nya",
+			"",
+			widget.NewLabel("Informasi-informasi dari commit di feature branch tersebut"),
+		)),
+	)
+	contributorContent := container.NewVSplit(featureContent, table)
 	contributorWrapper := wrapper.(*widget.Card)
-	contributorWrapper.SetContent(table)
+	contributorWrapper.SetContent(contributorContent)
 }
