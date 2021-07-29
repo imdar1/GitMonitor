@@ -11,8 +11,8 @@ import (
 )
 
 type authorTable struct {
-	Author
-	AuthorInfo
+	author     Author
+	authorInfo AuthorInfo
 }
 
 func InitContributionTab() fyne.CanvasObject {
@@ -20,7 +20,12 @@ func InitContributionTab() fyne.CanvasObject {
 }
 
 func getFeatureBranchesListCanvas(data ContributorData, appData *data.AppData) fyne.CanvasObject {
-	list := widget.NewList(
+	var branches []string
+	for _, task := range data.tasks {
+		branches = append(branches, appData.Database.GetBranchById(task.BranchId).Name)
+	}
+
+	taskList := widget.NewList(
 		func() int {
 			return len(data.tasks)
 		},
@@ -28,12 +33,42 @@ func getFeatureBranchesListCanvas(data ContributorData, appData *data.AppData) f
 			return container.NewHBox(widget.NewIcon(theme.DocumentIcon()), widget.NewLabel("Feature branch name"))
 		},
 		func(id widget.ListItemID, item fyne.CanvasObject) {
-			branch := appData.Database.GetBranchById(data.tasks[id].BranchId)
-			item.(*fyne.Container).Objects[1].(*widget.Label).SetText(branch.Name)
+			item.(*fyne.Container).Objects[1].(*widget.Label).SetText(branches[id])
 		},
 	)
+	taskDetailCard := widget.NewCard(
+		"",
+		"",
+		nil,
+	)
 
-	return list
+	taskList.OnSelected = func(id widget.ListItemID) {
+		taskDetailCard.SetTitle(data.tasks[id].Name)
+		commits, _ := appData.Repo.GetLogTwoBranches(
+			data.defaultBranchName,
+			branches[id],
+			data.defaultRemoteName,
+		)
+
+		var commitsString string
+		for _, commit := range commits {
+			commitsString = fmt.Sprintf("%s%s\n", commitsString, commit.String())
+		}
+		grid := widget.NewTextGridFromString(commitsString)
+		taskDetailCard.SetContent(grid)
+	}
+
+	taskList.OnUnselected = func(id widget.ListItemID) {
+		taskDetailCard.SetTitle("")
+		taskDetailCard.SetContent(nil)
+	}
+
+	featureContent := container.NewHSplit(
+		container.NewVScroll(taskList),
+		container.NewVScroll(taskDetailCard),
+	)
+
+	return featureContent
 }
 
 func RenderContributorTab(wrapper fyne.CanvasObject, data ContributorData, appData *data.AppData) {
@@ -75,41 +110,38 @@ func RenderContributorTab(wrapper fyne.CanvasObject, data ContributorData, appDa
 				// set content
 				switch id.Col {
 				case 0:
-					label.SetText(authorList[id.Row-1].Name)
+					label.SetText(authorList[id.Row-1].author.Name)
 				case 1:
-					label.SetText(authorList[id.Row-1].Email)
+					label.SetText(authorList[id.Row-1].author.Email)
 				case 2:
-					label.SetText(fmt.Sprintf("%d", authorList[id.Row-1].TotalCommit))
+					label.SetText(fmt.Sprintf("%d", authorList[id.Row-1].authorInfo.TotalCommit))
 				case 3:
-					label.SetText(string(authorList[id.Row-1].FirstCommit.Format("2 Jan 2006 15:04:05")))
+					label.SetText(string(authorList[id.Row-1].authorInfo.FirstCommit.Format("2 Jan 2006 15:04:05")))
 				case 4:
-					label.SetText(string(authorList[id.Row-1].LastCommit.Format("2 Jan 2006 15:04:05")))
+					label.SetText(string(authorList[id.Row-1].authorInfo.LastCommit.Format("2 Jan 2006 15:04:05")))
 				default:
 					label.SetText(" ")
 				}
 			}
 			if minLabelWidth[id.Col] < label.MinSize().Width {
 				minLabelWidth[id.Col] = label.MinSize().Width
-				go func() {
-					table.SetColumnWidth(id.Col, minLabelWidth[id.Col])
+				go func(id int) {
+					table.SetColumnWidth(id, minLabelWidth[id])
 					table.Refresh()
-				}()
+				}(id.Col)
 			}
 		},
 	)
 
-	for i := 0; i <= 4; i++ {
-		table.SetColumnWidth(i, 200)
-	}
+	// for i := 0; i <= 4; i++ {
+	// 	go func(id int) {
+	// 		table.SetColumnWidth(id, minLabelWidth[id])
+	// 		table.Refresh()
+	// 	}(i)
+	// 	// table.SetColumnWidth(i, 200)
+	// }
 
-	featureContent := container.NewHSplit(
-		container.NewVScroll(getFeatureBranchesListCanvas(data, appData)),
-		container.NewVScroll(widget.NewCard(
-			"Nama task-nya",
-			"",
-			widget.NewLabel("Informasi-informasi dari commit di feature branch tersebut"),
-		)),
-	)
+	featureContent := getFeatureBranchesListCanvas(data, appData)
 	contributorContent := container.NewVSplit(featureContent, table)
 	contributorWrapper := wrapper.(*widget.Card)
 	contributorWrapper.SetContent(contributorContent)
