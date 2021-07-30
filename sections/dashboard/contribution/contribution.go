@@ -33,7 +33,7 @@ func getFeatureBranchesListCanvas(data ContributorData, appData *data.AppData) f
 			return container.NewHBox(widget.NewIcon(theme.DocumentIcon()), widget.NewLabel("Feature branch name"))
 		},
 		func(id widget.ListItemID, item fyne.CanvasObject) {
-			item.(*fyne.Container).Objects[1].(*widget.Label).SetText(branches[id])
+			item.(*fyne.Container).Objects[1].(*widget.Label).SetText(data.tasks[id].Name)
 		},
 	)
 	taskDetailCard := widget.NewCard(
@@ -43,14 +43,17 @@ func getFeatureBranchesListCanvas(data ContributorData, appData *data.AppData) f
 	)
 
 	taskList.OnSelected = func(id widget.ListItemID) {
-		taskDetailCard.SetTitle(data.tasks[id].Name)
-		commits, _ := appData.Repo.GetLogTwoBranches(
+		taskDetailCard.SetTitle(branches[id])
+		commits, err := appData.Repo.GetLogTwoBranches(
 			data.defaultBranchName,
 			branches[id],
 			data.defaultRemoteName,
 		)
 
 		var commitsString string
+		if err != nil || len(commits) == 0 {
+			commitsString = "No commit found"
+		}
 		for _, commit := range commits {
 			commitsString = fmt.Sprintf("%s%s\n", commitsString, commit.String())
 		}
@@ -132,14 +135,6 @@ func RenderContributorTab(wrapper fyne.CanvasObject, data ContributorData, appDa
 			}
 		},
 	)
-
-	// for i := 0; i <= 4; i++ {
-	// 	go func(id int) {
-	// 		table.SetColumnWidth(id, minLabelWidth[id])
-	// 		table.Refresh()
-	// 	}(i)
-	// 	// table.SetColumnWidth(i, 200)
-	// }
 
 	featureContent := getFeatureBranchesListCanvas(data, appData)
 	contributorContent := container.NewVSplit(featureContent, table)
