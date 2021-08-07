@@ -45,7 +45,7 @@ const (
 	Waiting    TaskStatus = 0
 	InProgress TaskStatus = 1
 	Done       TaskStatus = 2
-	// Expired    TaskStatus = 3
+	DoneLate   TaskStatus = 3
 )
 
 var (
@@ -53,12 +53,13 @@ var (
 		"Waiting",
 		"In progress",
 		"Done",
+		"Done (Late)",
 	}
 	TaskStatusMap = map[int]string{
 		0: TaskStatusList[0],
 		1: TaskStatusList[1],
 		2: TaskStatusList[2],
-		// 3: "Expired",
+		3: TaskStatusList[3],
 	}
 )
 

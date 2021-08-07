@@ -77,6 +77,8 @@ func (t *timelineData) getGanttChartImage() []byte {
 			bar = ganttChart.Add(value.taskName).Blue()
 		case constants.InProgress:
 			bar = ganttChart.Add(value.taskName).Red()
+		case constants.DoneLate:
+			bar = ganttChart.Add(value.taskName).Yellow()
 		case constants.Done:
 			bar = ganttChart.Add(value.taskName)
 		default:
