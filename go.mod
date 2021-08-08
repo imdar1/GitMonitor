@@ -13,6 +13,7 @@ require (
 	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20210410170116-ea3d685f79fb // indirect
 	github.com/gobwas/ws v1.1.0-rc.6 // indirect
 	github.com/godbus/dbus/v5 v5.0.4 // indirect
+	github.com/golang/mock v1.6.0 // indirect
 	github.com/gregoryv/draw v0.19.0
 	github.com/hhatto/gocloc v0.4.1
 	github.com/kevinburke/ssh_config v1.1.0 // indirect

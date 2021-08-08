@@ -166,6 +166,24 @@ func showModifyTaskWindow(
 				return
 			}
 
+			currentTime := time.Now()
+			taskDeadline := time.Unix(data.task.EndDate, 0)
+			// set the deadline to the next day, 00.00
+			taskDeadline = time.Date(
+				taskDeadline.Year(),
+				taskDeadline.Month(),
+				taskDeadline.Day()+1,
+				0,
+				0,
+				0,
+				0,
+				taskDeadline.Location(),
+			)
+
+			if data.task.TaskStatus == int(constants.Done) && currentTime.After(taskDeadline) {
+				data.task.TaskStatus = int(constants.DoneLate)
+			}
+
 			err = appData.Database.UpdateTask(data.task)
 			if err != nil {
 				fmt.Println(err.Error())

@@ -53,13 +53,12 @@ var (
 		"Waiting",
 		"In progress",
 		"Done",
-		"Done (Late)",
 	}
 	TaskStatusMap = map[int]string{
 		0: TaskStatusList[0],
 		1: TaskStatusList[1],
 		2: TaskStatusList[2],
-		3: TaskStatusList[3],
+		3: "Done (Late)",
 	}
 )
 

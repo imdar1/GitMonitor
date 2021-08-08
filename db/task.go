@@ -5,6 +5,7 @@ import (
 	"gitmonitor/constants"
 	"gitmonitor/models"
 	"gitmonitor/services/utils"
+	"time"
 )
 
 func (db *DBConfig) GetTasksData(projectId int64) []models.Task {
@@ -144,20 +145,6 @@ func getBranchIdList(branches []models.Branch) []int {
 	return branchIdList
 }
 
-func (db *DBConfig) isTaskStatusInProgress(branchId int) bool {
-	var taskStatus int
-	const serviceName = "taskStatusIsInProgress"
-	query := fmt.Sprintf("SELECT task_status FROM task WHERE branch_id=%d", branchId)
-	rows := db.Driver.QueryRow(query)
-	err := rows.Scan(&taskStatus)
-	if err != nil {
-		utils.CheckErr(serviceName, err)
-		return false
-	}
-
-	return taskStatus == int(constants.InProgress)
-}
-
 func (db *DBConfig) SyncTask(tasks []models.Task, branches []models.Branch) error {
 	branchIdList := getBranchIdList(branches)
 	tx, err := db.Driver.Begin()
@@ -168,15 +155,36 @@ func (db *DBConfig) SyncTask(tasks []models.Task, branches []models.Branch) erro
 	queryTemplate := "UPDATE task SET task_status=%d WHERE branch_id=%d"
 	for _, v := range tasks {
 		if utils.IsExistInt(v.BranchId, branchIdList) {
-			query := fmt.Sprintf(queryTemplate, constants.InProgress, v.BranchId)
-			_, err := tx.Exec(query)
-			if err != nil {
-				tx.Rollback()
-				return err
+			if v.TaskStatus == int(constants.Waiting) {
+				query := fmt.Sprintf(queryTemplate, constants.InProgress, v.BranchId)
+				_, err := tx.Exec(query)
+				if err != nil {
+					tx.Rollback()
+					return err
+				}
 			}
 		} else {
-			if db.isTaskStatusInProgress(v.BranchId) {
-				query := fmt.Sprintf(queryTemplate, constants.Done, v.BranchId)
+			if v.TaskStatus == int(constants.InProgress) {
+				currentTime := time.Now()
+				taskDeadline := time.Unix(v.EndDate, 0)
+
+				// set the deadline to the next day, 00.00
+				taskDeadline = time.Date(
+					taskDeadline.Year(),
+					taskDeadline.Month(),
+					taskDeadline.Day()+1,
+					0,
+					0,
+					0,
+					0,
+					taskDeadline.Location(),
+				)
+
+				taskStatus := constants.Done
+				if currentTime.After(taskDeadline) {
+					taskStatus = constants.DoneLate
+				}
+				query := fmt.Sprintf(queryTemplate, taskStatus, v.BranchId)
 				_, err := tx.Exec(query)
 				if err != nil {
 					tx.Rollback()
