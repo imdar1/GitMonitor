@@ -47,9 +47,11 @@ func (db *DBConfig) GetProjectByDir(dir string) models.Project {
 		}
 		id := db.insertProject(project)
 		project.ProjectId = id
+		project.IsFirstTime = true
 		return project
 	}
 	utils.CheckErr(serviceName, err)
+	project.IsFirstTime = false
 
 	return project
 }
@@ -73,33 +75,22 @@ func (db *DBConfig) insertProject(p models.Project) int64 {
 	return id
 }
 
-func (db *DBConfig) UpdateDefaultRemoteName(remoteName string, projectId int64) error {
-	const serviceName = "UpdateRemoteName"
+func (db *DBConfig) UpdateProject(project models.Project) error {
+	const serviceName = "UpdateProject"
 	query := fmt.Sprintf(
-		"UPDATE project SET default_remote_name='%s' WHERE project_id=%d",
-		remoteName,
-		projectId,
-	)
-	tx, err := db.Driver.Begin()
-	if err != nil {
-		utils.CheckErr(serviceName, err)
-		return err
-	}
-	_, err = tx.Exec(query)
-	if err != nil {
-		tx.Rollback()
-		utils.CheckErr(serviceName, err)
-		return err
-	}
-	return nil
-}
-
-func (db *DBConfig) UpdateDefaultBranchName(branchName string, projectId int64) error {
-	const serviceName = "UpdateDefaultBranchName"
-	query := fmt.Sprintf(
-		"UPDATE project SET default_branch_name='%s' WHERE project_id=%d",
-		branchName,
-		projectId,
+		`UPDATE project 
+		SET project_dir='%s', 
+			project_start_date=%d
+			project_end_date=%d
+			default_branch_name='%s'
+			default_remote_name='%s'
+		WHERE project_id=%d`,
+		project.ProjectDir,
+		project.ProjectStartDate,
+		project.ProjectEndDate,
+		project.DefaultBranchName,
+		project.DefaultRemoteName,
+		project.ProjectId,
 	)
 	tx, err := db.Driver.Begin()
 	if err != nil {

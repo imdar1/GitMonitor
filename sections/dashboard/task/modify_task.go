@@ -6,6 +6,7 @@ import (
 	"gitmonitor/constants"
 	"gitmonitor/models"
 	"gitmonitor/sections/data"
+	"gitmonitor/services/utils"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -116,15 +117,6 @@ func validateTask(task models.Task) bool {
 		task.Name != "" && task.ProjectId != 0
 }
 
-// Convert string date with "DD/MM/YYYY" format into unix timestamp
-func getUnixTimeStampFromString(timeString string) (int64, error) {
-	date, err := time.Parse("02/01/2006", timeString)
-	if err != nil {
-		return 0, err
-	}
-	return date.Unix(), nil
-}
-
 func showModifyTaskWindow(
 	taskWrapper fyne.CanvasObject,
 	selectedTask models.Task,
@@ -142,12 +134,12 @@ func showModifyTaskWindow(
 		data,
 		func() {
 			// Validate start date and end date, then assign both to data
-			startDate, err := getUnixTimeStampFromString(data.tempStartDate)
+			startDate, err := utils.GetUnixTimeStampFromString(data.tempStartDate)
 			if err != nil {
 				dialog.ShowError(err, w)
 				return
 			}
-			endDate, err := getUnixTimeStampFromString(data.tempEndDate)
+			endDate, err := utils.GetUnixTimeStampFromString(data.tempEndDate)
 			if err != nil {
 				dialog.ShowError(err, w)
 				return
@@ -221,12 +213,12 @@ func showAddTaskWindow(taskWrapper fyne.CanvasObject, taskData TaskData, appData
 		data,
 		func() {
 			// Validate start date and end date, then assign both to data
-			startDate, err := getUnixTimeStampFromString(data.tempStartDate)
+			startDate, err := utils.GetUnixTimeStampFromString(data.tempStartDate)
 			if err != nil {
 				dialog.ShowError(err, w)
 				return
 			}
-			endDate, err := getUnixTimeStampFromString(data.tempEndDate)
+			endDate, err := utils.GetUnixTimeStampFromString(data.tempEndDate)
 			if err != nil {
 				dialog.ShowError(err, w)
 				return

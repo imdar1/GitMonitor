@@ -5,6 +5,8 @@ const DB_PATH = "./gitmonitor.db"
 const INIT_PROJECT_TABLE = `CREATE TABLE IF NOT EXISTS project(
 	"project_id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 	"project_dir" TEXT,
+	"project_start_date" INTEGER,
+	"project_end_date" INTEGER,
 	"default_branch_name" TEXT,
 	"default_remote_name" TEXT
 );`

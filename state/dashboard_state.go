@@ -7,6 +7,7 @@ import (
 	"gitmonitor/sections/dashboard/settings"
 	"gitmonitor/sections/dashboard/task"
 	"gitmonitor/sections/data"
+	"gitmonitor/sections/getting_started"
 	"gitmonitor/services/utils"
 
 	"fyne.io/fyne/v2"
@@ -25,6 +26,10 @@ func (tabState *TabItemsState) OnWindowLoaded(appData *data.AppData) {
 }
 
 func (tabState *TabItemsState) OnRepositoryLoaded(appData *data.AppData) {
+	if appData.SelectedProject.IsFirstTime {
+		getting_started.GettingStartedForm(appData)
+	}
+
 	// Fetch and checkout
 	err := appData.Repo.FetchAndCheckout(
 		auth.AskAuth,

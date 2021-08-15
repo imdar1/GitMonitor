@@ -27,6 +27,15 @@ func GetDayDifference(start time.Time, end time.Time) int {
 	return int(end.Sub(start).Hours()/24) + 1
 }
 
+// Convert string date with "DD/MM/YYYY" format into unix timestamp
+func GetUnixTimeStampFromString(timeString string) (int64, error) {
+	date, err := time.Parse("02/01/2006", timeString)
+	if err != nil {
+		return 0, err
+	}
+	return date.Unix(), nil
+}
+
 func CheckErr(serviceName string, err error) {
 	if err != nil {
 		log.Printf("[%s] Error: %s", serviceName, err.Error())

@@ -141,8 +141,8 @@ func RenderTaskTab(taskWrapper fyne.CanvasObject, taskData TaskData, appData *da
 		selectedTask := taskData.Tasks[taskIndex]
 		dialog.ShowConfirm(
 			"Confirm Deleting a Task",
-			"The current selected task is: "+selectedTask.Name+
-				"Are you sure you want to delete the selected text?",
+			"The selected task is "+selectedTask.Name+
+				". Are you sure you want to delete the selected task?",
 			func(isOk bool) {
 				if isOk {
 					err = appData.Database.DeleteTask(selectedTask)
