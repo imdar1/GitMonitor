@@ -1,17 +1,24 @@
 @startuml sequence_diagram4
 skinparam monochrome true
 actor User as user
-participant "TaskController" as a1
+participant "TaskUI" as a1
+participant "TaskModel" as a2
 database "Database" as db
 
 user -> a1: viewTimeline
 activate a1
 
-a1 -> db: getTask
+a1 -> a2: getTask
+activate a2
+
+a2 -> db: getTask
 activate db
 
-db --> a1
+db --> a2
 deactivate db
+
+a2 --> a1
+deactivate a2
 
 a1 --> user
 deactivate a1

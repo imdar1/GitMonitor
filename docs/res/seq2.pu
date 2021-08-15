@@ -1,23 +1,26 @@
 @startuml sequence_diagram2
 skinparam monochrome true
-participant "GitOperationsController" as a1
 actor User as user
-participant "BranchController" as a2
+participant "SettingUI" as i1
+participant "BranchModel" as a1
 database "Database" as db
 
-a1 -> user: branchList
-activate user
+user -> i1: setDefaultBranch
+activate i1
 
-user -> a2: setDefaultBranch
-activate a2
+i1 -> a1: setDefaultBranch
+activate a1
 
-a2 -> db: saveDefaultBranch
+a1 -> db: saveDefaultBranch
 activate db
 
-db-->a2
+db --> a1
 deactivate db
-a2--> user
-deactivate a2
-deactivate user
+
+a1 --> i1
+deactivate a1
+
+i1 --> user
+deactivate i1
 
 @enduml

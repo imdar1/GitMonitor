@@ -7,6 +7,10 @@ entity "Project" as e1 {
     **project_id: INT <<PK>>**
     --
     project_dir: VARCHAR
+    project_start_date: TIMESTAMP
+    project_end_date: TIMESTAMP
+    default_branch_name: VARCHAR
+    default_remote_name: VARCHAR
 }
 
 entity "Task" as e2 {
@@ -27,7 +31,7 @@ entity "Branch" as e3 {
     --
     **project_id: INT <<FK>>**
     name: VARCHAR
-    is_default: INT(1)
+    is_deleted: INT(1)
 }
 
 e1 ||--|{ e3

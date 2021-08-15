@@ -1,11 +1,15 @@
 @startuml sequence_diagram1
 skinparam monochrome true
 actor User as user
-participant "DirectoryExplorer" as a1
-participant "GitController" as a2
+participant "ProfileUI" as a3
+participant "ProfileState" as a1
+participant "GitConfig" as a2
 database "Database" as db
 
-user -> a1: setDirectory
+user -> a3: loadProject
+activate a3
+
+a3 -> a1: setDirectory
 activate a1
 
 a1 -> a2: verifyDirectory
@@ -20,12 +24,15 @@ alt valid directory
     db --> a2
     deactivate db
     a2 --> a1: Directory OK
-    a1 --> user: Directory Accepted
+    a1 --> a3: Directory Accepted
+    a3 --> user: OK
 else invalid directory
     a2 --> a1: No Git found
-    a1 --> user: Invalid Git Directory
+    a1 --> a3: Invalid Git Directory
+    a3 --> user: Error
 end
 deactivate a2
 deactivate a1
+deactivate a3
 
 @enduml

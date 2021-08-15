@@ -1,18 +1,20 @@
 @startuml sequence_diagram3
 skinparam monochrome true
 actor User as user
-participant "TaskController" as a1
-participant "BranchController" as a2
+participant "TaskUI" as i1
+participant "TaskModel" as a1
+participant "BranchModel" as a2
 database "Database" as db
 
-user -> a1: setProjectTasks
+user -> i1: setProjectTasks
+activate i1
+
+i1 -> a1: setProjectTasks
 activate a1
 
-a1 -> a1: verifyBranch
-activate a1
-a1 -> a2: setTaskBranch
+a1 -> a2: verifyTaskBranch
 activate a2
-a2 -> db: getDefaultBranch
+a2 -> db: getRemoteBranch
 activate db
 db --> a2
 deactivate db
@@ -20,15 +22,18 @@ a2 --> a1
 deactivate a2
 
 alt invalid branch
-    a1 --> user: Invalid branch
-    deactivate a1
+    a1 --> i1: Invalid branch
+    i1 --> user: Error
 else valid branch
     a1 -> db: saveTask
     activate db
     db --> a1
     deactivate db
-    a1 --> user: Tasks saved successfully
+    a1 --> i1: Tasks saved successfully
+    i1 --> user: OK
 end
+
 deactivate a1
+deactivate i1
 
 @enduml

@@ -2,16 +2,29 @@
 skinparam monochrome true
 left to right direction
 actor Pengguna as u
-rectangle "Essence Project" {
+rectangle "GitMonitor" {
     usecase "Atur direktori proyek Git" as uc1
     usecase "Atur branch proyek Git" as uc2
-    usecase "Atur task proyek" as uc3
-    usecase "Lihat timeline task proyek" as uc4
-    usecase "Lihat informasi proyek\nberdasarkan data Git" as uc5
+    usecase "Atur jadwal proyek" as uc3
+    usecase "Lihat timeline proyek\nberdasarkan task" as uc4
+    usecase "Lihat status jadwal proyek" as uc5
+    usecase "Lihat informasi proyek\nberdasarkan data Git" as uc6
+    usecase "Lihat kontribusi tiap pengembang\npada suatu task" as uc7
+    usecase "Lihat daftar pengembang" as uc8
+    usecase "Lihat nama proyek" as uc9
+    usecase "Lihat daftar commit seiring waktu" as uc10
 } 
+
 u --> uc1
 u --> uc2
-u --> uc3
-u --> uc5
+u -> uc3
+u --> uc6
+
 uc3 <.. uc4 : <<extend>>
+uc3 <.. uc5 : <<extend>>
+
+uc6 ..> uc7 : <<include>> 
+uc6 ..> uc8 : <<include>>
+uc6 ..> uc9 : <<include>>
+uc6 ..> uc10 : <<include>>
 @enduml

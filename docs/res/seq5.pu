@@ -1,17 +1,21 @@
 @startuml sequence_diagram5
 skinparam monochrome true
 actor User as user
-participant "GitOperationsController" as a1
-participant "TaskController" as a2
+participant "ProjectUI" as i1
+participant "GitConfig" as a1
+participant "TaskModel" as a2
 database "Database" as db
 
-user -> a1: viewProjectInformation
+user -> i1: viewProjectInformation
+activate i1
+
+i1 -> a1: getProjectInformation
 activate a1
 
-a1 -> a1: getProjectInformation
-activate a1
+a1 --> i1
+deactivate a1
 
-a1 -> a2: getProjectTasks
+i1 -> a2: getProjectTasks
 activate a2
 
 a2 -> db: getTasks
@@ -19,11 +23,10 @@ activate db
 
 db --> a2
 deactivate db
-a2 --> a1
+a2 --> i1
 deactivate a2
-deactivate a1
 
-a1 --> user
-deactivate a1
+i1 --> user
+deactivate i1
 
 @enduml
