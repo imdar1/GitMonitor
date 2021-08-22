@@ -31,14 +31,16 @@ func toChartValueAndGetMax(elements []int, diff int) ([]chart.Value, float64) {
 	max := float64(0)
 	currentTime := time.Now()
 	for _, element := range elements {
-		chartValue = append(chartValue, chart.Value{
-			Style: chart.Style{
-				Hidden:    false,
-				ClassName: fmt.Sprint(element),
+		chartValue = append([]chart.Value{
+			{
+				Style: chart.Style{
+					Hidden:    false,
+					ClassName: fmt.Sprint(element),
+				},
+				Value: float64(element),
+				Label: currentTime.Format("2 Jan"),
 			},
-			Value: float64(element),
-			Label: currentTime.Format("2 Jan"),
-		})
+		}, chartValue...)
 		max = math.Max(max, float64(element))
 		currentTime = currentTime.AddDate(0, 0, -diff)
 	}
@@ -73,6 +75,7 @@ func getLast30DayCommits(commits []*object.Commit) []int {
 
 func getMonthlyChart(commits []*object.Commit) image.Image {
 	thisMonthCommits := getLast30DayCommits(commits)
+	fmt.Println(thisMonthCommits)
 	chartValue, maxVal := toChartValueAndGetMax(thisMonthCommits, 1)
 	// prevent runtime error whenever each element is 0
 	maxVal += 1
