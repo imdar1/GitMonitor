@@ -98,14 +98,6 @@ func IsExistInt(element int, list []int) bool {
 	return false
 }
 
-func Reverse(input []int) []int {
-	a := input
-	for i, j := 0, len(a)-1; i < j; i, j = i+1, j-1 {
-		a[i], a[j] = a[j], a[i]
-	}
-	return a
-}
-
 func calculateEffectiveBarSpacing(bc chart.BarChart, canvasBox chart.Box) int {
 	totalWithBaseSpacing := len(bc.Bars) * (bc.GetBarWidth() + bc.GetBarSpacing())
 	if totalWithBaseSpacing > canvasBox.Width() {

@@ -17,7 +17,7 @@ import (
 
 func fillWithZerosNTimes(arr []int, n int, sizeLimit int) []int {
 	for i := 0; i < n; i++ {
-		if len(arr) == sizeLimit {
+		if len(arr) >= sizeLimit {
 			return arr
 		}
 		arr = append(arr, 0)
@@ -26,10 +26,10 @@ func fillWithZerosNTimes(arr []int, n int, sizeLimit int) []int {
 	return arr
 }
 
-func toChartValueAndGetMax(elements []int, diff int) ([]chart.Value, float64) {
+func toChartValueAndGetMax(elements []int, diff int, startDiff int) ([]chart.Value, float64) {
 	var chartValue []chart.Value
 	max := float64(0)
-	currentTime := time.Now()
+	currentTime := time.Now().AddDate(0, 0, -startDiff)
 	for _, element := range elements {
 		chartValue = append([]chart.Value{
 			{
@@ -75,8 +75,7 @@ func getLast30DayCommits(commits []*object.Commit) []int {
 
 func getMonthlyChart(commits []*object.Commit) image.Image {
 	thisMonthCommits := getLast30DayCommits(commits)
-	fmt.Println(thisMonthCommits)
-	chartValue, maxVal := toChartValueAndGetMax(thisMonthCommits, 1)
+	chartValue, maxVal := toChartValueAndGetMax(thisMonthCommits, 1, 0)
 	// prevent runtime error whenever each element is 0
 	maxVal += 1
 	chartRange := &chart.ContinuousRange{
