@@ -1,6 +1,7 @@
 package contribution
 
 import (
+	"gitmonitor/constants"
 	"gitmonitor/models"
 	"gitmonitor/services/utils"
 	"time"
@@ -69,6 +70,17 @@ func getAuthorInfoByAuthor(commits []*object.Commit) (map[Author]AuthorInfo, err
 	return authorInfoMap, nil
 }
 
+func getInProgressAndDoneTask(tasks []models.Task) []models.Task {
+	var inProgressAndDoneTasks []models.Task
+	for _, task := range tasks {
+		if task.TaskStatus == int(constants.InProgress) || task.TaskStatus == int(constants.Done) ||
+			task.TaskStatus == int(constants.DoneLate) {
+			inProgressAndDoneTasks = append(inProgressAndDoneTasks, task)
+		}
+	}
+	return inProgressAndDoneTasks
+}
+
 func InitContributorData(
 	commits []*object.Commit,
 	tasks []models.Task,
@@ -80,7 +92,7 @@ func InitContributorData(
 
 	return ContributorData{
 		authorMap:         contributorMap,
-		tasks:             tasks,
+		tasks:             getInProgressAndDoneTask(tasks),
 		defaultBranchName: defaultBranchName,
 		defaultRemoteName: defaultRemoteName,
 	}

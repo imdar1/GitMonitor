@@ -7,35 +7,21 @@ skinparam monochrome true
 hide circle
 
 namespace git {
-    top to bottom direction
-    class Author << (S,Aquamarine) >> {
-        + Name string
-        + Email string
-
-    }
-    class AuthorInfo << (S,Aquamarine) >> {
-        + TotalCommit int
-        + LastCommit time.Time
-        + FirstCommit time.Time
-
-    }
     class GitConfig << (S,Aquamarine) >> {
         - repo *git.Repository
         - auth transport.AuthMethod
 
-        + GetBranchList() : []string
-        + GetRemoteBranches(<font color=blue>func</font>() transport.AuthMethod) : ([]string, error)
-        + GetAuthorInfoByAuthor([]*object.Commit) : (<font color=blue>map</font>[Author]AuthorInfo, error)
-        + FetchAndCheckout(<font color=blue>func</font>() transport.AuthMethod) : error
-        + GetOriginUrl() : string
-        + GetPaths() : ([]string, error)
-        + GetCommitObjects() : ([]*object.Commit, error)
+        + GetBranchList() []string
+        + GetRemoteBranches(askAuth <font color=blue>func</font>() transport.AuthMethod) ([]string, error)
+        + GetLogTwoBranches(defaultBranch string, featureBranch string, remoteName string) ([]*object.Commit, error)
+        + Fetch(askAuth <font color=blue>func</font>() transport.AuthMethod, defaultRemoteName string) error
+        + Checkout(defaultBranchName string) error
+        + FetchAndCheckout(askAuth <font color=blue>func</font>() transport.AuthMethod, defaultBranchName string, defaultRemoteName string) error
+        + GetOriginUrl() string
+        + GetPaths() ([]string, error)
+        + GetCommitObjects() ([]*object.Commit, error)
 
     }
 }
-
-"git.GitConfig" -[hidden]- "git.Author"
-"git.GitConfig" -[hidden]- "git.AuthorInfo"
-
  
 @enduml

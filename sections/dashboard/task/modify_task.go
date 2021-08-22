@@ -2,7 +2,6 @@ package task
 
 import (
 	"errors"
-	"fmt"
 	"gitmonitor/constants"
 	"gitmonitor/models"
 	"gitmonitor/sections/data"
@@ -178,7 +177,7 @@ func showModifyTaskWindow(
 
 			err = appData.Database.UpdateTask(data.task)
 			if err != nil {
-				fmt.Println(err.Error())
+				utils.CheckErr("showModifyTaskWindow", err)
 				dialog.ShowError(err, w)
 				return
 			}

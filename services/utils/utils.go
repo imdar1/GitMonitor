@@ -1,12 +1,15 @@
 package utils
 
 import (
+	"fmt"
 	"log"
+	"math"
 	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/widget"
+	"github.com/wcharczuk/go-chart/v2"
 )
 
 func GetFirstAndLastDayOfMonth() (time.Time, time.Time) {
@@ -24,7 +27,7 @@ func GetStringFromDatetime(t time.Time) string {
 }
 
 func GetDayDifference(start time.Time, end time.Time) int {
-	return int(end.Sub(start).Hours()/24) + 1
+	return int(math.Floor(end.Sub(start).Hours() / 24))
 }
 
 // Convert string date with "DD/MM/YYYY" format into unix timestamp
@@ -101,4 +104,73 @@ func Reverse(input []int) []int {
 		a[i], a[j] = a[j], a[i]
 	}
 	return a
+}
+
+func calculateEffectiveBarSpacing(bc chart.BarChart, canvasBox chart.Box) int {
+	totalWithBaseSpacing := len(bc.Bars) * (bc.GetBarWidth() + bc.GetBarSpacing())
+	if totalWithBaseSpacing > canvasBox.Width() {
+		lessBarWidths := canvasBox.Width() - (len(bc.Bars) * bc.GetBarWidth())
+		if lessBarWidths > 0 {
+			return int(math.Ceil(float64(lessBarWidths) / float64(len(bc.Bars))))
+		}
+		return 0
+	}
+	return bc.GetBarSpacing()
+}
+
+func calculateEffectiveBarWidth(bc chart.BarChart, canvasBox chart.Box, spacing int) int {
+	totalWithBaseWidth := len(bc.Bars) * (bc.GetBarWidth() + spacing)
+	if totalWithBaseWidth > canvasBox.Width() {
+		totalLessBarSpacings := canvasBox.Width() - (len(bc.Bars) * spacing)
+		if totalLessBarSpacings > 0 {
+			return int(math.Ceil(float64(totalLessBarSpacings) / float64(len(bc.Bars))))
+		}
+		return 0
+	}
+	return bc.GetBarWidth()
+}
+
+func AddLabel(c *chart.BarChart, chartRange chart.Range) chart.Renderable {
+	return func(r chart.Renderer, canvasBox chart.Box, chartDefaults chart.Style) {
+		xoffset := canvasBox.Left
+
+		spacing := calculateEffectiveBarSpacing(*c, canvasBox)
+		width := calculateEffectiveBarWidth(*c, canvasBox, spacing)
+		bs2 := spacing >> 1
+
+		var bxl, bxr, by int
+		for _, bar := range c.Bars {
+			bxl = xoffset + bs2
+			bxr = bxl + width
+			xoffset += width + spacing
+			if int(bar.Value) == 0 {
+				continue
+			}
+
+			by = canvasBox.Bottom - chartRange.Translate(bar.Value)
+			lx := bxl + ((bxr - bxl) / 2)
+			ly := (canvasBox.Bottom + by) / 2
+
+			legendDefaults := chart.Style{
+				FillColor:   chart.ColorWhite,
+				FontColor:   chart.DefaultTextColor,
+				FontSize:    8.0,
+				StrokeColor: chart.DefaultAxisColor,
+				StrokeWidth: chart.DefaultAxisLineWidth,
+			}
+			bar.Style.InheritFrom(chartDefaults.InheritFrom(legendDefaults)).WriteToRenderer(r)
+			tb := r.MeasureText(fmt.Sprintf("%.0f", bar.Value))
+			lx = lx - (tb.Width() >> 1)
+			ly = ly + (tb.Height() >> 1)
+
+			if lx < 0 {
+				lx = 0
+			}
+			if ly < 0 {
+				lx = 0
+			}
+
+			r.Text(fmt.Sprintf("%.0f", bar.Value), lx, ly)
+		}
+	}
 }

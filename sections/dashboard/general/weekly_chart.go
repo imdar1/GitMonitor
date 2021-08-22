@@ -2,10 +2,8 @@ package general
 
 import (
 	"bytes"
-	"fmt"
 	"gitmonitor/services/utils"
 	"image"
-	"math"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -45,26 +43,15 @@ func getCommitsCountByWeeks(commits []*object.Commit, weeks int) []int {
 	return commitsCount
 }
 
-func toChartValueAndGetMax(elements []int, placeholder string) ([]chart.Value, float64) {
-	var chartValue []chart.Value
-	max := float64(0)
-	for index, element := range elements {
-		chartValue = append(chartValue, chart.Value{
-			Style: chart.Style{
-				Hidden:    false,
-				ClassName: fmt.Sprint(element),
-			},
-			Value: float64(element),
-			Label: fmt.Sprintf(placeholder, index+1),
-		})
-		max = math.Max(max, float64(element))
-	}
-	return chartValue, max
-}
-
 func getWeeklyChart(commits []*object.Commit) image.Image {
 	last10WeeksCommitsCount := getCommitsCountByWeeks(commits, 10)
-	chartValue, maxVal := toChartValueAndGetMax(last10WeeksCommitsCount, "Week-%d")
+	chartValue, maxVal := toChartValueAndGetMax(last10WeeksCommitsCount, 7)
+	// prevent runtime error whenever each element is 0
+	maxVal += 1
+	chartRange := &chart.ContinuousRange{
+		Min: 0,
+		Max: maxVal,
+	}
 
 	graph := chart.BarChart{
 		Background: chart.Style{
@@ -75,13 +62,19 @@ func getWeeklyChart(commits []*object.Commit) image.Image {
 		Height:   512,
 		BarWidth: 60,
 		Bars:     chartValue,
-		YAxis: chart.YAxis{
-			ValueFormatter: chart.IntValueFormatter,
-			Range: &chart.ContinuousRange{
-				Min: 0,
-				Max: maxVal,
-			},
+		XAxis: chart.Style{
+			StrokeWidth: 1,
 		},
+		YAxis: chart.YAxis{
+			Style: chart.Style{
+				StrokeWidth: 1,
+			},
+			Range: chartRange,
+		},
+	}
+
+	graph.Elements = []chart.Renderable{
+		utils.AddLabel(&graph, chartRange),
 	}
 
 	buf := new(bytes.Buffer)

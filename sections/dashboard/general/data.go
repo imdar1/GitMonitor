@@ -2,10 +2,13 @@ package general
 
 import (
 	"fmt"
+	"gitmonitor/constants"
+	"gitmonitor/models"
 	"gitmonitor/sections/data"
 	"gitmonitor/services/utils"
 	"path"
 	"regexp"
+	"time"
 
 	"fyne.io/fyne/v2/data/binding"
 	"github.com/go-git/go-git/v5/plumbing/object"
@@ -21,11 +24,13 @@ type FileInformation struct {
 
 type GeneralData struct {
 	FileInformation
-	ProjectDir    string
-	OriginUrl     string
-	ProjectName   string
-	RepoStartDate string
-	Commits       []*object.Commit
+	ProjectDir        string
+	OriginUrl         string
+	ProjectName       string
+	ProjectStartDate  string
+	ProjectEndDate    string
+	ProjectTaskStatus string
+	Commits           []*object.Commit
 }
 
 func getLinesOfCodeInformation(fileInformation FileInformation, paths []string) {
@@ -42,7 +47,7 @@ func getLinesOfCodeInformation(fileInformation FileInformation, paths []string) 
 	fileInformation.TotalBlanks.Set(fmt.Sprintf("%d lines", int(result.Total.Blanks)))
 }
 
-func InitGeneralData(appData *data.AppData) GeneralData {
+func InitGeneralData(tasks []models.Task, appData *data.AppData) GeneralData {
 	var data GeneralData
 	data.OriginUrl = appData.Repo.GetOriginUrl()
 	baseName := path.Base(data.OriginUrl)
@@ -61,10 +66,47 @@ func InitGeneralData(appData *data.AppData) GeneralData {
 		utils.CheckErr("InitGeneralData", err)
 	}
 
-	if len(commits) > 0 {
-		data.RepoStartDate = commits[len(commits)-1].Author.When.Format("2 Jan 2006 15:04:05")
+	if appData.SelectedProject.ProjectStartDate != 0 {
+		data.ProjectStartDate = time.Unix(appData.SelectedProject.ProjectStartDate, 0).Format("2 Jan 2006 ")
 	} else {
-		data.RepoStartDate = "No date"
+		data.ProjectStartDate = "No date"
+	}
+
+	if appData.SelectedProject.ProjectEndDate != 0 {
+		data.ProjectEndDate = time.Unix(appData.SelectedProject.ProjectEndDate, 0).Format("2 Jan 2006")
+	} else {
+		data.ProjectEndDate = "No date"
+	}
+
+	data.ProjectTaskStatus = "Project schedule has not been set" // task belum diatur
+
+	if appData.SelectedProject.ProjectEndDate > 0 {
+		taskCounter := 0
+		doneLateCounter := 0
+		inProgressCounter := 0
+		for _, task := range tasks {
+			taskCounter++
+			if task.TaskStatus == int(constants.DoneLate) {
+				doneLateCounter++
+			} else if task.TaskStatus == int(constants.InProgress) {
+				inProgressCounter++
+			}
+		}
+
+		if time.Now().Unix() > appData.SelectedProject.ProjectEndDate {
+			data.ProjectTaskStatus = "Late from the planned project end time"
+			if taskCounter > 0 {
+				data.ProjectTaskStatus = fmt.Sprintf(
+					"%s (%d remaining tasks)",
+					data.ProjectTaskStatus,
+					inProgressCounter,
+				)
+			}
+		} else if doneLateCounter > 0 {
+			data.ProjectTaskStatus = fmt.Sprintf("%d of %d tasks finished late", doneLateCounter, taskCounter)
+		} else {
+			data.ProjectTaskStatus = "On-track"
+		}
 	}
 
 	data.ProjectDir = appData.SelectedProject.ProjectDir

@@ -10,6 +10,9 @@ import (
 func (db *DBConfig) GetProjects() []models.Project {
 	const serviceName = "GetProjects"
 	var projects []models.Project
+	var projectStartDate sql.NullInt64
+	var projectEndDate sql.NullInt64
+
 	rows, err := db.Driver.Query("SELECT * FROM project")
 	utils.CheckErr(serviceName, err)
 	if rows != nil {
@@ -18,10 +21,14 @@ func (db *DBConfig) GetProjects() []models.Project {
 			err = rows.Scan(
 				&project.ProjectId,
 				&project.ProjectDir,
+				&projectStartDate,
+				&projectEndDate,
 				&project.DefaultBranchName,
 				&project.DefaultRemoteName,
 			)
 			utils.CheckErr(serviceName, err)
+			project.ProjectStartDate = projectStartDate.Int64
+			project.ProjectEndDate = projectEndDate.Int64
 			projects = append(projects, project)
 		}
 		rows.Close()
@@ -32,15 +39,22 @@ func (db *DBConfig) GetProjects() []models.Project {
 func (db *DBConfig) GetProjectByDir(dir string) models.Project {
 	var project models.Project
 	const serviceName = "GetProjectByDir"
+	var projectStartDate sql.NullInt64
+	var projectEndDate sql.NullInt64
 
 	query := fmt.Sprintf("SELECT * FROM project WHERE project_dir='%s' LIMIT 1;", dir)
 	rows := db.Driver.QueryRow(query)
 	err := rows.Scan(
 		&project.ProjectId,
 		&project.ProjectDir,
+		&projectStartDate,
+		&projectEndDate,
 		&project.DefaultBranchName,
 		&project.DefaultRemoteName,
 	)
+	project.ProjectStartDate = projectStartDate.Int64
+	project.ProjectEndDate = projectEndDate.Int64
+
 	if err == sql.ErrNoRows {
 		project = models.Project{
 			ProjectDir: dir,
@@ -80,11 +94,11 @@ func (db *DBConfig) UpdateProject(project models.Project) error {
 	query := fmt.Sprintf(
 		`UPDATE project 
 		SET project_dir='%s', 
-			project_start_date=%d
-			project_end_date=%d
-			default_branch_name='%s'
+			project_start_date=%d,
+			project_end_date=%d,
+			default_branch_name='%s',
 			default_remote_name='%s'
-		WHERE project_id=%d`,
+		WHERE project_id=%d;`,
 		project.ProjectDir,
 		project.ProjectStartDate,
 		project.ProjectEndDate,
@@ -103,5 +117,5 @@ func (db *DBConfig) UpdateProject(project models.Project) error {
 		utils.CheckErr(serviceName, err)
 		return err
 	}
-	return nil
+	return tx.Commit()
 }

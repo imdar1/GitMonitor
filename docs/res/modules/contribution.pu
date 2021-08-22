@@ -7,18 +7,6 @@ skinparam monochrome true
 hide circle
 
 namespace contribution {
-    class ContributorData << (S,Aquamarine) >> {
-        - authorMap <font color=blue>map</font>[git.Author]git.AuthorInfo
-
-    }
-    class authorTable << (S,Aquamarine) >> {
-    }
-}
-"git.Author" *-- "contribution.authorTable"
-"git.AuthorInfo" *-- "contribution.authorTable"
-
-namespace git {
-    top to bottom direction
     class Author << (S,Aquamarine) >> {
         + Name string
         + Email string
@@ -30,6 +18,23 @@ namespace git {
         + FirstCommit time.Time
 
     }
+    class ContributorData << (S,Aquamarine) >> {
+        - authorMap <font color=blue>map</font>[Author]AuthorInfo
+        - tasks []models.Task
+        - defaultBranchName string
+        - defaultRemoteName string
+
+    }
+    class authorTable << (S,Aquamarine) >> {
+        - author Author
+        - authorInfo AuthorInfo
+
+    }
 }
+
+"contribution.ContributorData" o-- "contribution.Author"
+"contribution.ContributorData" o-- "contribution.AuthorInfo" 
+"contribution.authorTable" o-- "contribution.Author"
+"contribution.authorTable" o-- "contribution.AuthorInfo"
 
 @enduml

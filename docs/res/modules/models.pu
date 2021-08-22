@@ -7,17 +7,22 @@ skinparam monochrome true
 hide circle
 
 namespace models {
-    class Project << (S,Aquamarine) >> {
-        + ProjectId int64
-        + ProjectDir string
-
-    }
     class Branch << (S,Aquamarine) >> {
         + BranchId int
         + ProjectId int
         + Name string
         + IsMergeTarget bool
         + IsDeleted bool
+
+    }
+    class Project << (S,Aquamarine) >> {
+        + ProjectId int64
+        + ProjectDir string
+        + ProjectStartDate int64
+        + ProjectEndDate int64
+        + DefaultBranchName string
+        + DefaultRemoteName string
+        + IsFirstTime bool
 
     }
     class Task << (S,Aquamarine) >> {

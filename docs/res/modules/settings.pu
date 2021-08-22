@@ -1,0 +1,15 @@
+@startuml
+top to bottom direction
+skinparam classAttributeIconSize 0
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 14
+skinparam monochrome true
+hide circle
+
+namespace settings {
+    class SettingsData << (S,Aquamarine) >> {
+        + RemoteBranches []models.Branch
+
+    }
+}
+@enduml

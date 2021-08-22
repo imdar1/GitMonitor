@@ -42,11 +42,13 @@ func RenderGeneralTab(wrapper fyne.CanvasObject, data GeneralData) {
 
 	// create components to render
 	projectNameLabel := widget.NewLabel(data.ProjectName)
-	startDateLabel := widget.NewLabel(data.RepoStartDate)
+	startDateLabel := widget.NewLabel(data.ProjectStartDate)
+	endDateLabel := widget.NewLabel(data.ProjectEndDate)
+	projectStatusLabel := widget.NewLabel(data.ProjectTaskStatus)
 	lastCommitLabel := widget.NewLabel(data.Commits[0].Committer.When.Format("2 Jan 2006 15:04:05"))
 	commitsLabel := widget.NewLabel(fmt.Sprintf("%d (%f average per all days)", len(data.Commits), avgCommits))
 	filesLabel := widget.NewLabelWithData(data.TotalFiles)
-	linesoCodeLabel := widget.NewLabelWithData(data.TotalCode)
+	linesOfCodeLabel := widget.NewLabelWithData(data.TotalCode)
 	commentLabel := widget.NewLabelWithData(data.TotalComments)
 	blankLabel := widget.NewLabelWithData(data.TotalBlanks)
 	authorLabel := widget.NewLabel(fmt.Sprintf("%d contributors", len(authors)))
@@ -54,9 +56,11 @@ func RenderGeneralTab(wrapper fyne.CanvasObject, data GeneralData) {
 		Items: []*widget.FormItem{
 			{Text: "Project Name", Widget: projectNameLabel},
 			{Text: "Project Start Date", Widget: startDateLabel},
+			{Text: "Project End Date", Widget: endDateLabel},
+			{Text: "Project Status", Widget: projectStatusLabel},
 			{Text: "Last Commit", Widget: lastCommitLabel},
 			{Text: "Files", Widget: filesLabel},
-			{Text: "Total Lines of Code", Widget: linesoCodeLabel},
+			{Text: "Total Lines of Code", Widget: linesOfCodeLabel},
 			{Text: "Total Comment Lines", Widget: commentLabel},
 			{Text: "Total Blank Lines", Widget: blankLabel},
 			{Text: "Total Commits", Widget: commitsLabel},

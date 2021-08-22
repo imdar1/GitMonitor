@@ -38,6 +38,12 @@ func RenderSettingsTab(wrapper fyne.CanvasObject, data SettingsData, appData *da
 	defaultRemoteName := appData.SelectedProject.DefaultRemoteName
 	projectStartDate := time.Unix(appData.SelectedProject.ProjectStartDate, 0).Format("02/01/2006")
 	projectEndDate := time.Unix(appData.SelectedProject.ProjectEndDate, 0).Format("02/01/2006")
+	if appData.SelectedProject.ProjectStartDate == 0 {
+		projectStartDate = ""
+	}
+	if appData.SelectedProject.ProjectEndDate == 0 {
+		projectEndDate = ""
+	}
 
 	// Default branch name section
 	remoteBranchesName := models.GetBranchesName(data.RemoteBranches)

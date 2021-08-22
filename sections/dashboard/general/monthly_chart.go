@@ -2,8 +2,10 @@ package general
 
 import (
 	"bytes"
+	"fmt"
 	"gitmonitor/services/utils"
 	"image"
+	"math"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -13,67 +15,71 @@ import (
 	"github.com/wcharczuk/go-chart/v2"
 )
 
-func getThisMonthCommits(commits []*object.Commit) []int {
-	commitsCount := []int{0}
-
-	firstDayOfMonth := utils.BeginningOfMonth()
-	lastDayChecked := time.Now().Day()
-	for _, v := range commits {
-		if v.Author.When.Before(firstDayOfMonth) {
-			break
+func fillWithZerosNTimes(arr []int, n int, sizeLimit int) []int {
+	for i := 0; i < n; i++ {
+		if len(arr) == sizeLimit {
+			return arr
 		}
-
-		if v.Author.When.Day() == lastDayChecked {
-			commitsCount[len(commitsCount)-1] += 1
-		} else if v.Author.When.Day() < lastDayChecked {
-			for i := lastDayChecked; i > v.Author.When.Day(); i-- {
-				commitsCount = append(commitsCount, 0)
-			}
-			commitsCount[len(commitsCount)-1] += 1
-		}
-		lastDayChecked = v.Author.When.Day()
+		arr = append(arr, 0)
 	}
 
-	commitsCount = utils.Reverse(commitsCount)
-	return commitsCount
+	return arr
+}
+
+func toChartValueAndGetMax(elements []int, diff int) ([]chart.Value, float64) {
+	var chartValue []chart.Value
+	max := float64(0)
+	currentTime := time.Now()
+	for _, element := range elements {
+		chartValue = append(chartValue, chart.Value{
+			Style: chart.Style{
+				Hidden:    false,
+				ClassName: fmt.Sprint(element),
+			},
+			Value: float64(element),
+			Label: currentTime.Format("2 Jan"),
+		})
+		max = math.Max(max, float64(element))
+		currentTime = currentTime.AddDate(0, 0, -diff)
+	}
+	return chartValue, max
 }
 
 func getLast30DayCommits(commits []*object.Commit) []int {
 	commitsCount := []int{}
-	count := 0
-	itr := 0
+	itr := 0 // commits current index
 	currentDate := time.Now()
 
 	for {
 		beginningOfDay := utils.BeginningOfDay(currentDate)
 		dayDiff := utils.GetDayDifference(utils.BeginningOfDay(commits[itr].Author.When), beginningOfDay)
 		beginningOfDay = beginningOfDay.AddDate(0, 0, -dayDiff)
-		for ; dayDiff > 0; dayDiff-- {
-			commitsCount = append(commitsCount, 0)
-			count++
-			if count == 30 {
-				return commitsCount
-			}
+
+		// Fill with zeros until reached the latest commit date
+		commitsCount = fillWithZerosNTimes(commitsCount, dayDiff, 30)
+		if len(commitsCount) == 30 {
+			return commitsCount
 		}
 
 		currCommitCount := 0
 		for utils.BeginningOfDay(commits[itr].Author.When).Equal(beginningOfDay) {
+			currentDate = commits[itr].Author.When.AddDate(0, 0, -1)
 			currCommitCount++
 			itr++
 		}
 		commitsCount = append(commitsCount, currCommitCount)
-		count++
-		if count == 30 {
-			return commitsCount
-		}
 	}
 }
 
 func getMonthlyChart(commits []*object.Commit) image.Image {
 	thisMonthCommits := getLast30DayCommits(commits)
-	chartValue, maxVal := toChartValueAndGetMax(thisMonthCommits, "Day-%d")
+	chartValue, maxVal := toChartValueAndGetMax(thisMonthCommits, 1)
 	// prevent runtime error whenever each element is 0
 	maxVal += 1
+	chartRange := &chart.ContinuousRange{
+		Min: 0,
+		Max: maxVal,
+	}
 
 	graph := chart.BarChart{
 		Background: chart.Style{
@@ -87,14 +93,19 @@ func getMonthlyChart(commits []*object.Commit) image.Image {
 		BaseValue:    0,
 		Bars:         chartValue,
 		XAxis: chart.Style{
+			StrokeWidth:         1,
 			TextRotationDegrees: 90,
 		},
 		YAxis: chart.YAxis{
-			Range: &chart.ContinuousRange{
-				Min: 0,
-				Max: maxVal,
+			Style: chart.Style{
+				StrokeWidth: 1,
 			},
+			Range: chartRange,
 		},
+	}
+
+	graph.Elements = []chart.Renderable{
+		utils.AddLabel(&graph, chartRange),
 	}
 
 	buf := new(bytes.Buffer)

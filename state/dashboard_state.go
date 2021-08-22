@@ -45,7 +45,7 @@ func (tabState *TabItemsState) OnRepositoryLoaded(appData *data.AppData) {
 
 	// Update general content
 	generalContent := tabState.GeneralContent.(*widget.Card)
-	generalData := general.InitGeneralData(appData)
+	generalData := general.InitGeneralData(taskData.Tasks, appData)
 	general.RenderGeneralTab(generalContent, generalData)
 
 	// Update contributor content

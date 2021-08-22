@@ -13,20 +13,20 @@ namespace db {
         + Close <font color=blue>func</font>() 
         __
         - insertProject(p models.Project) int64
-        - isTaskStatusInProgress(branchId int) bool
 
-        + GetBranchesData(int64) : ([]models.Branch, error)
-        + GetBranchById(int) : models.Branch
-        + GetBranchIdByName(string) : int
-        + SyncBranches(int64, []string) : error
-        + GetProjects() : []models.Project
-        + GetProjectByDir(string) : models.Project
-        + GetTasksData(int64) : []models.Task
-        + AddTask(models.Task) : error
-        + DeleteTask(models.Task) : error
-        + UpdateTask(models.Task) : error
-        + UpdateTaskStatus(models.Task, constants.TaskStatus) : error
-        + SyncTask([]models.Task, []models.Branch) : error
+        + GetBranchesData(projectId int64) ([]models.Branch, error)
+        + GetBranchById(branchId int) models.Branch
+        + GetBranchIdByName(branchName string) int
+        + SyncBranches(projectId int64, branches []string) error
+        + GetProjects() []models.Project
+        + GetProjectByDir(dir string) models.Project
+        + UpdateProject(project models.Project) error
+        + GetTasksData(projectId int64) []models.Task
+        + AddTask(task models.Task) error
+        + DeleteTask(task models.Task) error
+        + UpdateTask(task models.Task) error
+        + UpdateTaskStatus(task models.Task, status constants.TaskStatus) error
+        + SyncTask(tasks []models.Task, branches []models.Branch) error
 
     }
 }
