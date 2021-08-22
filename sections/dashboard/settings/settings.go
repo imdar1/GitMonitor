@@ -118,7 +118,7 @@ func RenderSettingsTab(wrapper fyne.CanvasObject, data SettingsData, appData *da
 	}
 
 	projectEndDateEntry := widget.NewEntry()
-	projectEndDateEntry.SetText(projectStartDate)
+	projectEndDateEntry.SetText(projectEndDate)
 	projectEndDateEntry.SetPlaceHolder("DD/MM/YYYY format")
 	projectEndDateEntry.OnChanged = func(s string) {
 		projectEndDate = s

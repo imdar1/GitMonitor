@@ -20,6 +20,44 @@ func InitContributionTab() fyne.CanvasObject {
 	return widget.NewLabel("Contribution Information")
 }
 
+func fillCommitString(
+	textGrid *widget.TextGrid,
+	data ContributorData,
+	appData *data.AppData,
+	featureBranchName string,
+	selectedIndex int,
+) {
+	commits, err := appData.Repo.GetLogTwoBranches(
+		data.defaultBranchName,
+		featureBranchName,
+		data.defaultRemoteName,
+	)
+
+	var commitsString string
+	if err != nil || len(commits) == 0 {
+		commitsString = "No commit found"
+	}
+	totalAddition := 0
+	totalDeletion := 0
+	for _, commit := range commits {
+		commitsString = fmt.Sprintf("%s%s\n", commitsString, commit.String())
+		stats, err := commit.Stats()
+		utils.CheckErr("getFeatureBranchesListCanvas", err)
+		for _, stat := range stats {
+			totalAddition += stat.Addition
+			totalDeletion += stat.Deletion
+		}
+	}
+	commitsString = fmt.Sprintf(
+		"Author: %s\nTotal Addition: %d\nTotal Deletion: %d\nCommit History:\n\n%s",
+		data.tasks[selectedIndex].AssigneeName,
+		totalAddition,
+		totalDeletion,
+		commitsString,
+	)
+	textGrid.SetText(commitsString)
+}
+
 func getFeatureBranchesListCanvas(data ContributorData, appData *data.AppData) fyne.CanvasObject {
 	var branches []string
 	for _, task := range data.tasks {
@@ -44,44 +82,18 @@ func getFeatureBranchesListCanvas(data ContributorData, appData *data.AppData) f
 	)
 
 	taskList.OnSelected = func(id widget.ListItemID) {
-		if branches[id] == "" {
+		selectedBranchName := branches[id]
+		if selectedBranchName == "" {
 			taskDetailCard.SetTitle("No associated branch found")
 			grid := widget.NewTextGridFromString("No commit found")
 			taskDetailCard.SetContent(grid)
 			return
 		}
 
-		taskDetailCard.SetTitle(branches[id])
-		commits, err := appData.Repo.GetLogTwoBranches(
-			data.defaultBranchName,
-			branches[id],
-			data.defaultRemoteName,
-		)
-
-		var commitsString string
-		if err != nil || len(commits) == 0 {
-			commitsString = "No commit found"
-		}
-		totalAddition := 0
-		totalDeletion := 0
-		for _, commit := range commits {
-			commitsString = fmt.Sprintf("%s%s\n", commitsString, commit.String())
-			stats, err := commit.Stats()
-			utils.CheckErr("getFeatureBranchesListCanvas", err)
-			for _, stat := range stats {
-				totalAddition += stat.Addition
-				totalDeletion += stat.Deletion
-			}
-		}
-		commitsString = fmt.Sprintf(
-			"Author: %s\nTotal Addition: %d\nTotal Deletion: %d\nCommit History:\n\n%s",
-			data.tasks[id].AssigneeName,
-			totalAddition,
-			totalDeletion,
-			commitsString,
-		)
-		grid := widget.NewTextGridFromString(commitsString)
+		taskDetailCard.SetTitle(selectedBranchName)
+		grid := widget.NewTextGridFromString(fmt.Sprintf("Analyzing %s branch...", selectedBranchName))
 		taskDetailCard.SetContent(grid)
+		go fillCommitString(grid, data, appData, selectedBranchName, id)
 	}
 
 	taskList.OnUnselected = func(id widget.ListItemID) {
