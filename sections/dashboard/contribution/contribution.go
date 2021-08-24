@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gitmonitor/sections/data"
 	"gitmonitor/services/utils"
+	"sync"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -114,6 +115,7 @@ func renderContributorTab(data ContributorData, appData *data.AppData) {
 	}
 
 	minLabelWidth := []float32{0, 0, 0, 0, 0}
+	var mu = &sync.Mutex{}
 
 	var table *widget.Table
 	table = widget.NewTable(
@@ -160,11 +162,13 @@ func renderContributorTab(data ContributorData, appData *data.AppData) {
 				}
 			}
 			if minLabelWidth[id.Col] < label.MinSize().Width {
+				mu.Lock()
 				minLabelWidth[id.Col] = label.MinSize().Width
 				go func(id int) {
 					table.SetColumnWidth(id, minLabelWidth[id])
 					table.Refresh()
 				}(id.Col)
+				mu.Unlock()
 			}
 		},
 	)

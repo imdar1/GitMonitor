@@ -48,7 +48,7 @@ func InitReadTaskData(wrapper fyne.CanvasObject, appData *data.AppData) TaskData
 	}
 }
 
-func (t TaskData) RefreshTasksFromTaskData(appData *data.AppData) {
+func (t *TaskData) RefreshTasksFromTaskData(appData *data.AppData) {
 	t.Tasks = appData.Database.GetTasksData(t.Project.ProjectId)
 }
 

@@ -92,6 +92,8 @@ func invokeAdditionalRenderers(taskData TaskData, appData *data.AppData) {
 	const serviceName = "invokeAdditionalRenderers"
 
 	// Re-render general, contribution, and task tabs
+	taskData.RefreshTasksFromTaskData(appData)
+	renderTaskTab(taskData, appData)
 	for _, renderer := range taskData.AdditionalRenderers {
 		switch rendererWithType := renderer.(type) {
 		case general.GeneralData:
@@ -109,8 +111,6 @@ func invokeAdditionalRenderers(taskData TaskData, appData *data.AppData) {
 			utils.CheckErr(serviceName, errors.New("unidentified type"))
 		}
 	}
-	taskData.RefreshTasksFromTaskData(appData)
-	renderTaskTab(taskData, appData)
 }
 
 // Render task to taskWrapper from given taskData and other operations needed to perform from db

@@ -42,32 +42,35 @@ func (data GeneralData) Render(appData *data.AppData) {
 }
 
 func (data *GeneralData) UpdateProjectTaskStatus(appData *data.AppData) {
-	data.ProjectTaskStatus = "Project schedule has not been set" // task belum diatur
+	data.ProjectTaskStatus = "Project schedule has not been set"
 
 	if appData.SelectedProject.ProjectEndDate > 0 {
+		mapTaskStatusToCounter := map[int]int{}
 		taskCounter := 0
-		doneLateCounter := 0
-		inProgressCounter := 0
 		for _, task := range data.tasks {
+			mapTaskStatusToCounter[task.TaskStatus]++
 			taskCounter++
-			if task.TaskStatus == int(constants.DoneLate) {
-				doneLateCounter++
-			} else if task.TaskStatus == int(constants.InProgress) {
-				inProgressCounter++
-			}
 		}
 
 		if time.Now().Unix() > appData.SelectedProject.ProjectEndDate {
 			data.ProjectTaskStatus = "Late from the planned project end time"
-			if taskCounter > 0 {
+			waitingAndInProgressCount :=
+				mapTaskStatusToCounter[int(constants.Waiting)] + mapTaskStatusToCounter[int(constants.InProgress)]
+			if waitingAndInProgressCount > 0 {
 				data.ProjectTaskStatus = fmt.Sprintf(
 					"%s (%d remaining tasks)",
 					data.ProjectTaskStatus,
-					inProgressCounter,
+					waitingAndInProgressCount,
 				)
+			} else {
+				data.ProjectTaskStatus = "Project has finished"
 			}
-		} else if doneLateCounter > 0 {
-			data.ProjectTaskStatus = fmt.Sprintf("%d of %d tasks finished late", doneLateCounter, taskCounter)
+		} else if mapTaskStatusToCounter[int(constants.DoneLate)] > 0 {
+			data.ProjectTaskStatus = fmt.Sprintf(
+				"%d of %d tasks finished late",
+				mapTaskStatusToCounter[int(constants.DoneLate)],
+				taskCounter,
+			)
 		} else {
 			data.ProjectTaskStatus = "On-track"
 		}
@@ -123,6 +126,7 @@ func InitGeneralData(wrapper fyne.CanvasObject, tasks []models.Task, appData *da
 		utils.CheckErr("InitGeneralData", err)
 	}
 
+	data.tasks = tasks
 	data.UpdateProjectStartDate(appData)
 	data.UpdateProjectEndDate(appData)
 	data.UpdateProjectTaskStatus(appData)

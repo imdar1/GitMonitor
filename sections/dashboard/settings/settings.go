@@ -67,7 +67,7 @@ func renderSettingsTab(data SettingsData, appData *data.AppData) {
 	)
 	defaultBranchWrapper := widget.NewCard(
 		"Default Branch",
-		"Set Git default branch to monitor (default = master)",
+		"Set Git default branch to monitor (default = master). Please reload the project to see the changes that have been applied.",
 		defaultBranchContent,
 	)
 
@@ -95,7 +95,7 @@ func renderSettingsTab(data SettingsData, appData *data.AppData) {
 	)
 	defaultRemoteNameWrapper := widget.NewCard(
 		"Default Remote Name",
-		"Set Git default remote name (default = origin)",
+		"Set Git default remote name (default = origin). Please reload the project to see the changes that have been applied.",
 		defaultRemoteNameContent,
 	)
 

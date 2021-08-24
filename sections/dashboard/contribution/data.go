@@ -37,7 +37,7 @@ func (data ContributorData) Render(appData *data.AppData) {
 	renderContributorTab(data, appData)
 }
 
-func (data ContributorData) SetTasks(tasks []models.Task) {
+func (data *ContributorData) SetTasks(tasks []models.Task) {
 	data.tasks = getInProgressAndDoneTask(tasks)
 }
 
