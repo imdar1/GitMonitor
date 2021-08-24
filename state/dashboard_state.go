@@ -38,41 +38,54 @@ func (tabState *TabItemsState) OnRepositoryLoaded(appData *data.AppData) {
 	)
 	utils.CheckErr("OnRepositoryLoaded", err)
 
-	// Update task content
+	// Init task content
 	taskContent := tabState.TaskContent.(*widget.Card)
-	taskData := task.InitReadTaskData(appData)
-	task.RenderTaskTab(taskContent, taskData, appData)
+	taskRenderer := task.InitReadTaskData(taskContent, appData)
 
-	// Update general content
+	// Init general content
 	generalContent := tabState.GeneralContent.(*widget.Card)
-	generalData := general.InitGeneralData(taskData.Tasks, appData)
-	general.RenderGeneralTab(generalContent, generalData)
+	generalRenderer := general.InitGeneralData(generalContent, taskRenderer.Tasks, appData)
 
-	// Update contributor content
+	// Init contributor content
 	contributionContent := tabState.ContributionContent.(*widget.Card)
-	contributionData := contribution.InitContributorData(
-		generalData.Commits,
-		taskData.Tasks,
+	contributionRenderer := contribution.InitContributorData(
+		contributionContent,
+		generalRenderer.Commits,
+		taskRenderer.Tasks,
 		appData.SelectedProject.DefaultBranchName,
 		appData.SelectedProject.DefaultRemoteName,
 	)
-	contribution.RenderContributorTab(contributionContent, contributionData, appData)
 
 	// Update settings tab
 	settingsContent := tabState.SettingsContent.(*widget.Card)
-	settingsData := settings.SettingsData{
-		RemoteBranches: taskData.Branches,
+	settingsRenderer := settings.InitSettingsData(settingsContent, taskRenderer.Branches)
+
+	// Add necessary renderers
+	taskRenderer.AdditionalRenderers = []data.Renderer{
+		generalRenderer,
+		contributionRenderer,
 	}
-	settings.RenderSettingsTab(settingsContent, settingsData, appData)
+	settingsRenderer.AdditionalRenderers = []data.Renderer{
+		generalRenderer,
+	}
+
+	// Render general, task, contribution, and settings
+	generalRenderer.Render(appData)
+	taskRenderer.Render(appData)
+	contributionRenderer.Render(appData)
+	settingsRenderer.Render(appData)
+}
+
+func initRenderer(caption string) fyne.CanvasObject {
+	return widget.NewLabel(caption)
 }
 
 func InitTabItems() TabItemsState {
-
 	tabItems := TabItemsState{
-		GeneralContent:      widget.NewCard("", "", general.InitGeneralTab()),
-		TaskContent:         widget.NewCard("", "", task.InitTaskTab()),
-		ContributionContent: widget.NewCard("", "", contribution.InitContributionTab()),
-		SettingsContent:     widget.NewCard("", "", settings.InitSettingsTab()),
+		GeneralContent:      widget.NewCard("", "", initRenderer("General Information")),
+		TaskContent:         widget.NewCard("", "", initRenderer("Task Information")),
+		ContributionContent: widget.NewCard("", "", initRenderer("Contribution Information")),
+		SettingsContent:     widget.NewCard("", "", initRenderer("Settings")),
 	}
 	return tabItems
 }

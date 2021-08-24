@@ -11,3 +11,7 @@ type AppData struct {
 	Database        *db.DBConfig
 	SelectedProject models.Project
 }
+
+type Renderer interface {
+	Render(data *AppData)
+}

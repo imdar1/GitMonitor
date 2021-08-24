@@ -3,9 +3,11 @@ package contribution
 import (
 	"gitmonitor/constants"
 	"gitmonitor/models"
+	"gitmonitor/sections/data"
 	"gitmonitor/services/utils"
 	"time"
 
+	"fyne.io/fyne/v2"
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
@@ -23,10 +25,20 @@ type AuthorInfo struct {
 }
 
 type ContributorData struct {
-	authorMap         map[Author]AuthorInfo
+	Wrapper fyne.CanvasObject
+
 	tasks             []models.Task
+	authorMap         map[Author]AuthorInfo
 	defaultBranchName string
 	defaultRemoteName string
+}
+
+func (data ContributorData) Render(appData *data.AppData) {
+	renderContributorTab(data, appData)
+}
+
+func (data ContributorData) SetTasks(tasks []models.Task) {
+	data.tasks = getInProgressAndDoneTask(tasks)
 }
 
 func getAuthorInfoByAuthor(commits []*object.Commit) (map[Author]AuthorInfo, error) {
@@ -82,6 +94,7 @@ func getInProgressAndDoneTask(tasks []models.Task) []models.Task {
 }
 
 func InitContributorData(
+	wrapper fyne.CanvasObject,
 	commits []*object.Commit,
 	tasks []models.Task,
 	defaultBranchName string,
@@ -95,5 +108,6 @@ func InitContributorData(
 		tasks:             getInProgressAndDoneTask(tasks),
 		defaultBranchName: defaultBranchName,
 		defaultRemoteName: defaultRemoteName,
+		Wrapper:           wrapper,
 	}
 }

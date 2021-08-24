@@ -16,10 +16,6 @@ type authorTable struct {
 	authorInfo AuthorInfo
 }
 
-func InitContributionTab() fyne.CanvasObject {
-	return widget.NewLabel("Contribution Information")
-}
-
 func fillCommitString(
 	textGrid *widget.TextGrid,
 	data ContributorData,
@@ -47,6 +43,9 @@ func fillCommitString(
 			totalAddition += stat.Addition
 			totalDeletion += stat.Deletion
 		}
+	}
+	if len(commits) == 0 {
+		commitsString = "No commit found"
 	}
 	commitsString = fmt.Sprintf(
 		"Author: %s\nTotal Addition: %d\nTotal Deletion: %d\nCommit History:\n\n%s",
@@ -84,8 +83,7 @@ func getFeatureBranchesListCanvas(data ContributorData, appData *data.AppData) f
 	taskList.OnSelected = func(id widget.ListItemID) {
 		selectedBranchName := branches[id]
 		if selectedBranchName == "" {
-			taskDetailCard.SetTitle("No associated branch found")
-			grid := widget.NewTextGridFromString("No commit found")
+			grid := widget.NewTextGridFromString("No associated branch found")
 			taskDetailCard.SetContent(grid)
 			return
 		}
@@ -109,7 +107,7 @@ func getFeatureBranchesListCanvas(data ContributorData, appData *data.AppData) f
 	return featureContent
 }
 
-func RenderContributorTab(wrapper fyne.CanvasObject, data ContributorData, appData *data.AppData) {
+func renderContributorTab(data ContributorData, appData *data.AppData) {
 	authorList := []authorTable{}
 	for key, value := range data.authorMap {
 		authorList = append(authorList, authorTable{key, value})
@@ -173,6 +171,6 @@ func RenderContributorTab(wrapper fyne.CanvasObject, data ContributorData, appDa
 
 	featureContent := getFeatureBranchesListCanvas(data, appData)
 	contributorContent := container.NewVSplit(featureContent, table)
-	contributorWrapper := wrapper.(*widget.Card)
+	contributorWrapper := data.Wrapper.(*widget.Card)
 	contributorWrapper.SetContent(contributorContent)
 }

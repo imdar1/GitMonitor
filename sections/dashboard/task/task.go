@@ -5,6 +5,8 @@ import (
 	"errors"
 	"gitmonitor/constants"
 	"gitmonitor/models"
+	"gitmonitor/sections/dashboard/contribution"
+	"gitmonitor/sections/dashboard/general"
 	"gitmonitor/sections/data"
 	"gitmonitor/services/utils"
 	"image"
@@ -86,11 +88,39 @@ func getTaskDetailCanvas(selectedTask models.Task, selectedBranch models.Branch)
 	return form
 }
 
+func invokeAdditionalRenderers(taskData TaskData, appData *data.AppData) {
+	const serviceName = "invokeAdditionalRenderers"
+
+	// Re-render general, contribution, and task tabs
+	for _, renderer := range taskData.AdditionalRenderers {
+		switch rendererWithType := renderer.(type) {
+		case general.GeneralData:
+			generalRenderer := general.InitGeneralData(
+				rendererWithType.Wrapper,
+				taskData.Tasks,
+				appData,
+			)
+			generalRenderer.Render(appData)
+		case contribution.ContributorData:
+			contributionRenderer := rendererWithType
+			contributionRenderer.SetTasks(taskData.Tasks)
+			contributionRenderer.Render(appData)
+		default:
+			utils.CheckErr(serviceName, errors.New("unidentified type"))
+		}
+	}
+	taskData.RefreshTasksFromTaskData(appData)
+	renderTaskTab(taskData, appData)
+}
+
 // Render task to taskWrapper from given taskData and other operations needed to perform from db
-func RenderTaskTab(taskWrapper fyne.CanvasObject, taskData TaskData, appData *data.AppData) {
+func renderTaskTab(
+	taskData TaskData,
+	appData *data.AppData,
+) {
 	timeData := initData(taskData)
 	svgString := timeData.getGanttChartImage()
-	taskWrapperCard := taskWrapper.(*widget.Card)
+	taskWrapperCard := taskData.wrapper.(*widget.Card)
 
 	var ganttChartCanvas fyne.CanvasObject
 	if len(svgString) == 0 {
@@ -127,7 +157,7 @@ func RenderTaskTab(taskWrapper fyne.CanvasObject, taskData TaskData, appData *da
 		}
 
 		selectedTask := taskData.Tasks[taskIndex]
-		showModifyTaskWindow(taskWrapper, selectedTask, taskData, appData)
+		showModifyTaskWindow(selectedTask, taskData, appData)
 	})
 
 	deleteTaskButton := widget.NewButton("Delete Task", func() {
@@ -153,9 +183,8 @@ func RenderTaskTab(taskWrapper fyne.CanvasObject, taskData TaskData, appData *da
 						)
 					}
 
-					// Re-render task tab
-					taskData.RefreshTasksFromTaskData(appData)
-					RenderTaskTab(taskWrapper, taskData, appData)
+					// Re-render general, contribution, and task tabs
+					invokeAdditionalRenderers(taskData, appData)
 				}
 			},
 			fyne.CurrentApp().Driver().AllWindows()[0],

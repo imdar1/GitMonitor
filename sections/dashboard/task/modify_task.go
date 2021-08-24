@@ -117,7 +117,6 @@ func validateTask(task models.Task) bool {
 }
 
 func showModifyTaskWindow(
-	taskWrapper fyne.CanvasObject,
 	selectedTask models.Task,
 	taskData TaskData,
 	appData *data.AppData,
@@ -182,9 +181,8 @@ func showModifyTaskWindow(
 				return
 			}
 
-			// Re-render task
-			taskData.RefreshTasksFromTaskData(appData)
-			RenderTaskTab(taskWrapper, taskData, appData)
+			// Re-render general, contribution, and task tabs
+			invokeAdditionalRenderers(taskData, appData)
 
 			dialog.ShowInformation("Success", "Task was successfully updated", w)
 			w.Close()
@@ -242,9 +240,8 @@ func showAddTaskWindow(taskWrapper fyne.CanvasObject, taskData TaskData, appData
 				return
 			}
 
-			// Re-render task
-			taskData.RefreshTasksFromTaskData(appData)
-			RenderTaskTab(taskWrapper, taskData, appData)
+			// Re-render general, contribution, and task tabs
+			invokeAdditionalRenderers(taskData, appData)
 
 			dialog.ShowInformation("Success", "Task was successfully added", w)
 			w.Close()

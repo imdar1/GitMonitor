@@ -5,15 +5,10 @@ import (
 	"gitmonitor/constants"
 	"gitmonitor/services/utils"
 
-	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
-
-func InitGeneralTab() fyne.CanvasObject {
-	return widget.NewLabel("General Information")
-}
 
 func getAuthors(commits []*object.Commit) []string {
 	set := make(map[string]bool)
@@ -30,7 +25,7 @@ func getAuthors(commits []*object.Commit) []string {
 	return signatures
 }
 
-func RenderGeneralTab(wrapper fyne.CanvasObject, data GeneralData) {
+func renderGeneralTab(data GeneralData) {
 	// Preprocess data
 	authors := getAuthors(data.Commits)
 	startDate := data.Commits[len(data.Commits)-1].Author.When
@@ -81,6 +76,6 @@ func RenderGeneralTab(wrapper fyne.CanvasObject, data GeneralData) {
 	)
 	vBox := container.NewVBox(projectInfoWrapper, weeklyChartWrapper, monthlyChartWrapper)
 
-	generalWrapper := wrapper.(*widget.Card)
+	generalWrapper := data.Wrapper.(*widget.Card)
 	generalWrapper.SetContent(container.NewVScroll(vBox))
 }

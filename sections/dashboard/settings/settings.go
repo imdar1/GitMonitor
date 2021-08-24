@@ -3,7 +3,7 @@ package settings
 import (
 	"errors"
 	"gitmonitor/models"
-	"gitmonitor/sections/auth"
+	"gitmonitor/sections/dashboard/general"
 	"gitmonitor/sections/data"
 	"gitmonitor/services/utils"
 	"time"
@@ -15,10 +15,6 @@ import (
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
-
-func InitSettingsTab() fyne.CanvasObject {
-	return widget.NewLabel("Settings")
-}
 
 func updateProjectDialogue(appData *data.AppData, title string, description string) {
 	err := appData.Database.UpdateProject(appData.SelectedProject)
@@ -33,7 +29,7 @@ func updateProjectDialogue(appData *data.AppData, title string, description stri
 	)
 }
 
-func RenderSettingsTab(wrapper fyne.CanvasObject, data SettingsData, appData *data.AppData) {
+func renderSettingsTab(data SettingsData, appData *data.AppData) {
 	defaultBranchName := appData.SelectedProject.DefaultBranchName
 	defaultRemoteName := appData.SelectedProject.DefaultRemoteName
 	projectStartDate := time.Unix(appData.SelectedProject.ProjectStartDate, 0).Format("02/01/2006")
@@ -53,9 +49,6 @@ func RenderSettingsTab(wrapper fyne.CanvasObject, data SettingsData, appData *da
 		defaultBranchName = s
 	}
 
-	checkoutButton := widget.NewButtonWithIcon("Checkout", theme.ViewRefreshIcon(), func() {
-		appData.Repo.Checkout(defaultBranchName)
-	})
 	saveBranchButton := widget.NewButtonWithIcon("Save", theme.DocumentSaveIcon(), func() {
 		appData.SelectedProject.DefaultBranchName = defaultBranchName
 		updateProjectDialogue(
@@ -64,7 +57,7 @@ func RenderSettingsTab(wrapper fyne.CanvasObject, data SettingsData, appData *da
 			"The default branch name was successfully updated",
 		)
 	})
-	defaultBranchButtonWrapper := container.NewHBox(layout.NewSpacer(), checkoutButton, saveBranchButton)
+	defaultBranchButtonWrapper := container.NewHBox(layout.NewSpacer(), saveBranchButton)
 	defaultBranchContent := container.NewBorder(
 		nil,
 		defaultBranchButtonWrapper,
@@ -84,9 +77,6 @@ func RenderSettingsTab(wrapper fyne.CanvasObject, data SettingsData, appData *da
 	defaultRemoteNameEntry.OnChanged = func(s string) {
 		defaultRemoteName = s
 	}
-	fetchButton := widget.NewButtonWithIcon("Fetch", theme.ViewRefreshIcon(), func() {
-		appData.Repo.Fetch(auth.AskAuth, defaultRemoteName)
-	})
 	saveRemoteButton := widget.NewButtonWithIcon("Save", theme.DocumentSaveIcon(), func() {
 		appData.SelectedProject.DefaultRemoteName = defaultRemoteName
 		updateProjectDialogue(
@@ -95,7 +85,7 @@ func RenderSettingsTab(wrapper fyne.CanvasObject, data SettingsData, appData *da
 			"The default remote name was successfully updated",
 		)
 	})
-	defaultRemoteButtonWrapper := container.NewHBox(layout.NewSpacer(), fetchButton, saveRemoteButton)
+	defaultRemoteButtonWrapper := container.NewHBox(layout.NewSpacer(), saveRemoteButton)
 	defaultRemoteNameContent := container.NewBorder(
 		nil,
 		defaultRemoteButtonWrapper,
@@ -138,6 +128,14 @@ func RenderSettingsTab(wrapper fyne.CanvasObject, data SettingsData, appData *da
 
 		appData.SelectedProject.ProjectStartDate = startDate
 		appData.SelectedProject.ProjectEndDate = endDate
+
+		// Re-render general tab
+		generalRenderer := data.AdditionalRenderers[0].(general.GeneralData)
+		generalRenderer.UpdateProjectStartDate(appData)
+		generalRenderer.UpdateProjectEndDate(appData)
+		generalRenderer.UpdateProjectTaskStatus(appData)
+		generalRenderer.Render(appData)
+
 		updateProjectDialogue(
 			appData,
 			"Success",
@@ -170,7 +168,7 @@ func RenderSettingsTab(wrapper fyne.CanvasObject, data SettingsData, appData *da
 		projectDateContent,
 	)
 
-	settingsWrapper := wrapper.(*widget.Card)
+	settingsWrapper := data.Wrapper.(*widget.Card)
 	settingsWrapper.SetContent(
 		container.NewVScroll(
 			container.NewVBox(
