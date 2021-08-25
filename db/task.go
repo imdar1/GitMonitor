@@ -146,6 +146,7 @@ func getBranchIdList(branches []models.Branch) []int {
 }
 
 func (db *DBConfig) SyncTask(tasks []models.Task, branches []models.Branch) error {
+	const serviceName = "SyncTask"
 	branchIdList := getBranchIdList(branches)
 	tx, err := db.Driver.Begin()
 	if err != nil {
@@ -155,16 +156,15 @@ func (db *DBConfig) SyncTask(tasks []models.Task, branches []models.Branch) erro
 	queryTemplate := "UPDATE task SET task_status=%d WHERE branch_id=%d"
 	for _, v := range tasks {
 		if utils.IsExistInt(v.BranchId, branchIdList) {
-			if v.TaskStatus == int(constants.Waiting) {
+			branch := db.GetBranchById(v.BranchId)
+			if v.TaskStatus == int(constants.Waiting) && !branch.IsDeleted {
 				query := fmt.Sprintf(queryTemplate, constants.InProgress, v.BranchId)
 				_, err := tx.Exec(query)
 				if err != nil {
 					tx.Rollback()
-					return err
+					utils.CheckErr(serviceName, err)
 				}
-			}
-		} else {
-			if v.TaskStatus == int(constants.InProgress) {
+			} else if v.TaskStatus == int(constants.InProgress) && branch.IsDeleted {
 				currentTime := time.Now()
 				taskDeadline := time.Unix(v.EndDate, 0)
 
@@ -188,7 +188,7 @@ func (db *DBConfig) SyncTask(tasks []models.Task, branches []models.Branch) erro
 				_, err := tx.Exec(query)
 				if err != nil {
 					tx.Rollback()
-					return err
+					utils.CheckErr(serviceName, err)
 				}
 			}
 		}
