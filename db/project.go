@@ -57,7 +57,9 @@ func (db *DBConfig) GetProjectByDir(dir string) models.Project {
 
 	if err == sql.ErrNoRows {
 		project = models.Project{
-			ProjectDir: dir,
+			ProjectDir:        dir,
+			DefaultBranchName: "master",
+			DefaultRemoteName: "origin",
 		}
 		id := db.insertProject(project)
 		project.ProjectId = id
@@ -75,10 +77,12 @@ func (db *DBConfig) insertProject(p models.Project) int64 {
 	dir := p.ProjectDir
 	insertQuery := fmt.Sprintf(
 		`INSERT INTO project(project_dir, project_start_date, project_end_date, default_branch_name, default_remote_name) 
-			VALUES('%s', %d, %d, 'master', 'origin');`,
+			VALUES('%s', %d, %d, '%s', '%s');`,
 		dir,
 		p.ProjectStartDate,
 		p.ProjectEndDate,
+		p.DefaultBranchName,
+		p.DefaultRemoteName,
 	)
 	statement, err := db.Driver.Prepare(insertQuery)
 	utils.CheckErr(serviceName, err)

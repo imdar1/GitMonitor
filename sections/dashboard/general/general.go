@@ -30,7 +30,7 @@ func renderGeneralTab(data GeneralData) {
 	authors := getAuthors(data.Commits)
 	startDate := data.Commits[len(data.Commits)-1].Author.When
 	endDate := data.Commits[0].Author.When
-	dayDiff := utils.GetDayDifference(startDate, endDate)
+	dayDiff := utils.GetDayDifference(startDate, endDate) + 1
 	avgCommits := float32(len(data.Commits)) / float32(dayDiff)
 
 	go getLinesOfCodeInformation(data.FileInformation, []string{data.ProjectDir})
