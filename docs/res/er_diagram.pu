@@ -3,6 +3,8 @@ skinparam monochrome true
 hide circle
 skinparam linetype ortho
 left to right direction
+skinparam backgroundcolor transparent
+
 entity "Project" as e1 {
     **project_id: INT <<PK>>**
     --

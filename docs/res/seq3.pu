@@ -5,6 +5,7 @@ participant "TaskUI" as i1
 participant "TaskModel" as a1
 participant "BranchModel" as a2
 database "Database" as db
+skinparam backgroundcolor transparent
 
 user -> i1: setProjectTasks
 activate i1

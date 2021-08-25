@@ -5,6 +5,7 @@ participant "ProfileUI" as a3
 participant "ProfileState" as a1
 participant "GitConfig" as a2
 database "Database" as db
+skinparam backgroundcolor transparent
 
 user -> a3: loadProject
 activate a3

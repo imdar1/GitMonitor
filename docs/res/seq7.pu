@@ -3,10 +3,11 @@ skinparam monochrome true
 actor User as user
 participant "TaskUI" as a1
 participant "TaskModel" as a2
+participant "ProjectModel" as a3
 database "Database" as db
 skinparam backgroundcolor transparent
 
-user -> a1: viewTimeline
+user -> a1: viewProjectScheduleStatus
 activate a1
 
 a1 -> a2: getTask
@@ -20,6 +21,18 @@ deactivate db
 
 a2 --> a1
 deactivate a2
+
+a1 --> a3: getProject
+activate a3
+
+a3 --> db: getProject
+activate db
+
+db --> a3
+deactivate db
+
+a3 -> a1
+deactivate a3
 
 a1 --> user
 deactivate a1

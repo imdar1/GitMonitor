@@ -4,6 +4,7 @@ actor User as user
 participant "SettingUI" as i1
 participant "BranchModel" as a1
 database "Database" as db
+skinparam backgroundcolor transparent
 
 user -> i1: setDefaultBranch
 activate i1

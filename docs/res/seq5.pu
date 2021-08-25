@@ -5,6 +5,7 @@ participant "ProjectUI" as i1
 participant "GitConfig" as a1
 participant "TaskModel" as a2
 database "Database" as db
+skinparam backgroundcolor transparent
 
 user -> i1: viewProjectInformation
 activate i1
