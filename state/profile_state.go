@@ -9,7 +9,7 @@ import (
 
 type ProfileState struct {
 	ProjectEntry *widget.SelectEntry
-	projects     []models.Project
+	projects     []string
 }
 
 func getProjectName(p []models.Project) []string {
@@ -23,15 +23,15 @@ func getProjectName(p []models.Project) []string {
 func (p *ProfileState) OnWindowLoaded(appData *data.AppData) {
 	projectList := appData.Database.GetProjects()
 	if projectList != nil {
-		p.projects = projectList
-		projectName := getProjectName(p.projects)
-		p.ProjectEntry.SetOptions(projectName)
+		p.projects = getProjectName(projectList)
+		p.ProjectEntry.SetOptions(p.projects)
 	}
 }
 
 func (p *ProfileState) OnRepositoryLoaded(appData *data.AppData) {
 	project := appData.Database.GetProjectByDir(p.ProjectEntry.Text)
-	projectName := getProjectName(p.projects)
-	p.ProjectEntry.SetOptions(projectName)
+	projectList := appData.Database.GetProjects()
+	p.projects = getProjectName(projectList)
+	p.ProjectEntry.SetOptions(p.projects)
 	appData.SelectedProject = project
 }
