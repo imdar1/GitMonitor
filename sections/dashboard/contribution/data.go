@@ -38,7 +38,7 @@ func (data ContributorData) Render(appData *data.AppData) {
 }
 
 func (data *ContributorData) SetTasks(tasks []models.Task) {
-	data.tasks = getInProgressAndDoneTask(tasks)
+	data.tasks = getInProgressTask(tasks)
 }
 
 func getAuthorInfoByAuthor(commits []*object.Commit) (map[Author]AuthorInfo, error) {
@@ -82,15 +82,14 @@ func getAuthorInfoByAuthor(commits []*object.Commit) (map[Author]AuthorInfo, err
 	return authorInfoMap, nil
 }
 
-func getInProgressAndDoneTask(tasks []models.Task) []models.Task {
-	var inProgressAndDoneTasks []models.Task
+func getInProgressTask(tasks []models.Task) []models.Task {
+	var inProgressTasks []models.Task
 	for _, task := range tasks {
-		if task.TaskStatus == int(constants.InProgress) || task.TaskStatus == int(constants.Done) ||
-			task.TaskStatus == int(constants.DoneLate) {
-			inProgressAndDoneTasks = append(inProgressAndDoneTasks, task)
+		if task.TaskStatus == int(constants.InProgress) {
+			inProgressTasks = append(inProgressTasks, task)
 		}
 	}
-	return inProgressAndDoneTasks
+	return inProgressTasks
 }
 
 func InitContributorData(
@@ -105,7 +104,7 @@ func InitContributorData(
 
 	return ContributorData{
 		authorMap:         contributorMap,
-		tasks:             getInProgressAndDoneTask(tasks),
+		tasks:             getInProgressTask(tasks),
 		defaultBranchName: defaultBranchName,
 		defaultRemoteName: defaultRemoteName,
 		Wrapper:           wrapper,
