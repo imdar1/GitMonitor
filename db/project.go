@@ -74,9 +74,11 @@ func (db *DBConfig) insertProject(p models.Project) int64 {
 	const serviceName = "insertProject"
 	dir := p.ProjectDir
 	insertQuery := fmt.Sprintf(
-		`INSERT INTO project(project_dir, default_branch_name, default_remote_name) 
-			VALUES('%s', 'master', 'origin');`,
+		`INSERT INTO project(project_dir, project_start_date, project_end_date, default_branch_name, default_remote_name) 
+			VALUES('%s', %d, %d, 'master', 'origin');`,
 		dir,
+		p.ProjectStartDate,
+		p.ProjectEndDate,
 	)
 	statement, err := db.Driver.Prepare(insertQuery)
 	utils.CheckErr(serviceName, err)
