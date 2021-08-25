@@ -27,7 +27,7 @@ func GetStringFromDatetime(t time.Time) string {
 }
 
 func GetDayDifference(start time.Time, end time.Time) int {
-	return int(math.Floor(end.Sub(start).Hours() / 24))
+	return int(math.Floor(end.Sub(start).Hours()/24)) + 1
 }
 
 // Convert string date with "DD/MM/YYYY" format into unix timestamp

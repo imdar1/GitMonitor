@@ -54,7 +54,7 @@ func getLast30DayCommits(commits []*object.Commit) []int {
 
 	for {
 		beginningOfDay := utils.BeginningOfDay(currentDate)
-		dayDiff := utils.GetDayDifference(utils.BeginningOfDay(commits[itr].Author.When), beginningOfDay)
+		dayDiff := utils.GetDayDifference(utils.BeginningOfDay(commits[itr].Author.When), beginningOfDay) - 1
 		beginningOfDay = beginningOfDay.AddDate(0, 0, -dayDiff)
 
 		// Fill with zeros until reached the latest commit date
