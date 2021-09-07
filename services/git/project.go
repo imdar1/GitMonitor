@@ -1,6 +1,7 @@
 package git
 
 import (
+	"fmt"
 	"gitmonitor/services/utils"
 
 	"github.com/go-git/go-git/v5"
@@ -107,10 +108,29 @@ func (r *GitConfig) GetPaths() ([]string, error) {
 	return paths, nil
 }
 
-func (r *GitConfig) GetCommitObjects() ([]*object.Commit, error) {
-	cIter, err := r.repo.Log(&git.LogOptions{
-		Order: git.LogOrderCommitterTime,
-	})
+func (r *GitConfig) GetCommitObjects(
+	remoteName string,
+	defaultBranch string,
+) ([]*object.Commit, error) {
+
+	var cIter object.CommitIter
+	var err error
+
+	commitHash, err := r.repo.ResolveRevision(
+		plumbing.Revision(fmt.Sprintf("refs/remotes/%s/%s", remoteName, defaultBranch)),
+	)
+
+	if err == nil {
+		cIter, err = r.repo.Log(&git.LogOptions{
+			From:  *commitHash,
+			Order: git.LogOrderCommitterTime,
+		})
+	} else {
+		cIter, err = r.repo.Log(&git.LogOptions{
+			Order: git.LogOrderCommitterTime,
+		})
+	}
+
 	if err != nil {
 		return nil, err
 	}

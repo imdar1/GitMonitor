@@ -119,7 +119,10 @@ func InitGeneralData(wrapper fyne.CanvasObject, tasks []models.Task, appData *da
 		data.ProjectName = baseName
 	}
 
-	commits, err := appData.Repo.GetCommitObjects()
+	commits, err := appData.Repo.GetCommitObjects(
+		appData.SelectedProject.DefaultRemoteName,
+		appData.SelectedProject.DefaultBranchName,
+	)
 	if err == nil {
 		data.Commits = commits
 	} else {

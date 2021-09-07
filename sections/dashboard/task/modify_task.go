@@ -147,6 +147,10 @@ func showModifyTaskWindow(
 
 			// Get branch id for selected branch
 			data.task.BranchId = appData.Database.GetBranchIdByName(data.tempBranch)
+			if data.tempBranch != "" && data.task.BranchId == 0 {
+				dialog.ShowError(errors.New("invalid branch"), w)
+				return
+			}
 			data.task.ProjectId = taskData.Project.ProjectId
 			// data.task.TaskStatus = int(constants.Waiting)
 
@@ -225,6 +229,10 @@ func showAddTaskWindow(taskWrapper fyne.CanvasObject, taskData TaskData, appData
 
 			// Get branch id for selected branch
 			data.task.BranchId = appData.Database.GetBranchIdByName(data.tempBranch)
+			if data.tempBranch != "" && data.task.BranchId == 0 {
+				dialog.ShowError(errors.New("invalid branch"), w)
+				return
+			}
 			data.task.ProjectId = taskData.Project.ProjectId
 			// data.task.TaskStatus = int(constants.Waiting)
 

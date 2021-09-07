@@ -18,3 +18,13 @@ func GetBranchName(branchId int, branches []Branch) string {
 	}
 	return name
 }
+
+func GetAvailableBranches(branches []Branch) []Branch {
+	var availableBranches []Branch
+	for _, v := range branches {
+		if !v.IsDeleted {
+			availableBranches = append(availableBranches, v)
+		}
+	}
+	return availableBranches
+}

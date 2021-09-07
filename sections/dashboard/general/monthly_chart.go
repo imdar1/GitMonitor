@@ -53,7 +53,21 @@ func getLast30DayCommits(commits []*object.Commit) []int {
 	currentDate := time.Now()
 
 	for {
+		if itr > len(commits)-1 {
+			commitsCount = fillWithZerosNTimes(commitsCount, 30, 30)
+			return commitsCount
+		}
 		beginningOfDay := utils.BeginningOfDay(currentDate)
+		beginningOfDay = time.Date(
+			beginningOfDay.Year(),
+			beginningOfDay.Month(),
+			beginningOfDay.Day(),
+			beginningOfDay.Hour(),
+			beginningOfDay.Minute(),
+			beginningOfDay.Second(),
+			beginningOfDay.Nanosecond(),
+			commits[itr].Author.When.Location(),
+		)
 		dayDiff := utils.GetDayDifference(utils.BeginningOfDay(commits[itr].Author.When), beginningOfDay) - 1
 		beginningOfDay = beginningOfDay.AddDate(0, 0, -dayDiff)
 
@@ -68,6 +82,9 @@ func getLast30DayCommits(commits []*object.Commit) []int {
 			currentDate = commits[itr].Author.When.AddDate(0, 0, -1)
 			currCommitCount++
 			itr++
+			if itr > len(commits)-1 {
+				break
+			}
 		}
 		commitsCount = append(commitsCount, currCommitCount)
 	}

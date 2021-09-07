@@ -76,18 +76,25 @@ func (t *timelineData) getGanttChartImage() []byte {
 		case constants.Waiting:
 			bar = ganttChart.Add(value.taskName).Blue()
 		case constants.InProgress:
-			bar = ganttChart.Add(value.taskName).Red()
+			bar = ganttChart.Add(value.taskName).Orange()
 		case constants.DoneLate:
 			bar = ganttChart.Add(value.taskName).Yellow()
 		case constants.Done:
-			bar = ganttChart.Add(value.taskName)
+			bar = ganttChart.Add(value.taskName).Green()
 		default:
 			bar = ganttChart.Add(value.taskName)
 		}
 		ganttChart.Place(bar).At(date.String(value.startDateStr), value.days)
 	}
+	legends := make(map[string]string)
+	emptyTask := design.Task{}
+	legends[emptyTask.Blue().GetClass()] = "Waiting"
+	legends[emptyTask.Orange().GetClass()] = "In Progress"
+	legends[emptyTask.Green().GetClass()] = "Done"
+	legends[emptyTask.Yellow().GetClass()] = "Done (Late)"
+	ganttChart.Legends = legends
+	ganttChart.SetRowSpace(3)
 
-	ganttChart.SetCaption("Project Schedule")
 	imgBuffer := new(bytes.Buffer)
 	styling := ganttChart.Diagram.Style
 	styling.SetOutput(imgBuffer)

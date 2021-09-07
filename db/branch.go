@@ -86,13 +86,15 @@ func (db *DBConfig) SyncBranches(projectId int64, branches []string) error {
 	}
 	for _, v := range branchesModel {
 		isExist := utils.IsExistStr(v.Name, branches)
+		isDeleted := 0
 		if !isExist {
-			deleteQuery := fmt.Sprintf("UPDATE branch SET is_deleted=1 WHERE name='%s';", v.Name)
-			_, err := delTx.Exec(deleteQuery)
-			if err != nil {
-				delTx.Rollback()
-				return err
-			}
+			isDeleted = 1
+		}
+		deleteQuery := fmt.Sprintf("UPDATE branch SET is_deleted=%d WHERE name='%s';", isDeleted, v.Name)
+		_, err := delTx.Exec(deleteQuery)
+		if err != nil {
+			delTx.Rollback()
+			return err
 		}
 	}
 	err = delTx.Commit()

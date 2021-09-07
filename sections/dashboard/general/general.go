@@ -66,7 +66,7 @@ func renderGeneralTab(data GeneralData) {
 	projectInfoWrapper := widget.NewCard("Project Information", "", form)
 	weeklyChartWrapper := widget.NewCard(
 		"Weekly Chart",
-		"Last activities in the last 10 weeks. Week-10 is the current week.",
+		"Last activities in the last 10 weeks.",
 		getWeeklyChartCanvas(data.Commits),
 	)
 	monthlyChartWrapper := widget.NewCard(

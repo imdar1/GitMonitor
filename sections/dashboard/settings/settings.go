@@ -42,12 +42,12 @@ func renderSettingsTab(data SettingsData, appData *data.AppData) {
 	}
 
 	// Default branch name section
-	remoteBranchesName := models.GetBranchesName(data.RemoteBranches)
-	defaultBranchEntry := widget.NewSelectEntry(remoteBranchesName)
-	defaultBranchEntry.SetText(defaultBranchName)
-	defaultBranchEntry.OnChanged = func(s string) {
+	availableRemoteBranches := models.GetAvailableBranches(data.RemoteBranches)
+	remoteBranchesName := models.GetBranchesName(availableRemoteBranches)
+	defaultBranchEntry := widget.NewSelect(remoteBranchesName, func(s string) {
 		defaultBranchName = s
-	}
+	})
+	defaultBranchEntry.SetSelected(defaultBranchName)
 
 	saveBranchButton := widget.NewButtonWithIcon("Save", theme.DocumentSaveIcon(), func() {
 		appData.SelectedProject.DefaultBranchName = defaultBranchName

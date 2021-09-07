@@ -24,7 +24,7 @@ func fillCommitString(
 	featureBranchName string,
 	selectedIndex int,
 ) {
-	commits, err := appData.Repo.GetLogTwoBranches(
+	commits, commonAncestorCommit, err := appData.Repo.GetLogTwoBranches(
 		data.defaultBranchName,
 		featureBranchName,
 		data.defaultRemoteName,
@@ -36,9 +36,14 @@ func fillCommitString(
 	}
 	totalAddition := 0
 	totalDeletion := 0
-	for _, commit := range commits {
+	for index, commit := range commits {
+		baseCommit := commonAncestorCommit
+		if index < len(commits)-1 {
+			baseCommit = commits[index+1]
+		}
+		stats, err := appData.Repo.GetDiff(commit, baseCommit)
+
 		commitsString = fmt.Sprintf("%s%s\n", commitsString, commit.String())
-		stats, err := commit.Stats()
 		utils.CheckErr("getFeatureBranchesListCanvas", err)
 		for _, stat := range stats {
 			totalAddition += stat.Addition
@@ -120,7 +125,7 @@ func renderContributorTab(data ContributorData, appData *data.AppData) {
 	var table *widget.Table
 	table = widget.NewTable(
 		func() (int, int) {
-			return len(data.authorMap), 5
+			return len(data.authorMap) + 1, 5
 		},
 		func() fyne.CanvasObject {
 			return widget.NewLabel(" ")

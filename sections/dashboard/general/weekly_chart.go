@@ -34,14 +34,10 @@ func getCommitsCountByWeeks(commits []*object.Commit, weeks int) []int {
 				commitsCount[len(commitsCount)-1] += 1
 			}
 		} else {
-			isInsert := false
 			for v.Author.When.Before(beginningOfWeek) && weeks > 0 {
-				if isInsert {
-					commitsCount = append(commitsCount, 0)
-					weeks -= 1
-				}
+				commitsCount = append(commitsCount, 0)
+				weeks -= 1
 				beginningOfWeek = beginningOfWeek.AddDate(0, 0, -7)
-				isInsert = true
 			}
 			if weeks > 0 {
 				commitsCount = append(commitsCount, 1)
