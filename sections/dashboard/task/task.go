@@ -136,7 +136,7 @@ func renderTaskTab(
 
 	selectedTaskIndex := binding.NewInt()
 	selectedTaskIndex.Set(-1)
-	taskContentTop := container.NewVScroll(ganttChartCanvas)
+	taskContentTop := container.NewScroll(ganttChartCanvas)
 
 	taskDetail := container.NewBorder(nil, nil, nil, nil, widget.NewLabel("Informasi task"))
 	taskContentBottom := container.NewHSplit(

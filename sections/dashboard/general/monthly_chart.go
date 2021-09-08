@@ -112,13 +112,9 @@ func getMonthlyChart(commits []*object.Commit) image.Image {
 		BaseValue:    0,
 		Bars:         chartValue,
 		XAxis: chart.Style{
-			StrokeWidth:         1,
 			TextRotationDegrees: 90,
 		},
 		YAxis: chart.YAxis{
-			Style: chart.Style{
-				StrokeWidth: 1,
-			},
 			Range: chartRange,
 		},
 	}
