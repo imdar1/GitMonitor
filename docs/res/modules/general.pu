@@ -7,22 +7,32 @@ skinparam monochrome true
 hide circle
 
 namespace general {
-    class FileInformation << (S,Aquamarine) >> {
-        + TotalFiles string
-        + TotalCode string
-        + TotalComments string
-        + TotalBlanks string
-
+    class fileInformation << (S,Aquamarine) >> {
+        + TotalFiles binding.String
+        + TotalCode binding.String
+        + TotalComments binding.String
+        + TotalBlanks binding.String
     }
+
     class GeneralData << (S,Aquamarine) >> {
+        - tasks []models.Task
+
         + ProjectDir string
         + OriginUrl string
         + ProjectName string
-        + RepoStartDate string
+        + ProjectStartDate string
+        + ProjectEndDate string
+        + ProjectTaskStatus string
         + Commits []*object.Commit
+        + Wrapper fyne.CanvasObject
+
+        + Render(appData *data.AppData) 
+        + UpdateProjectTaskStatus(appData *data.AppData) 
+        + UpdateProjectStartDate(appData *data.AppData) 
+        + UpdateProjectEndDate(appData *data.AppData) 
 
     }
 }
-"general.FileInformation" *-- "general.GeneralData"
+"general.fileInformation" *-- "general.GeneralData"
 
 @enduml

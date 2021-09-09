@@ -8,34 +8,39 @@ hide circle
 
 namespace task {
     class TaskData << (S,Aquamarine) >> {
-        + Project models.Project
-        + Tasks []models.Task
-        + Branches []models.Branch
+- wrapper fyne.CanvasObject
+
++ Project models.Project
++ Tasks []models.Task
++ Branches []models.Branch
++ AdditionalRenderers []data.Renderer
 
         + RefreshTasksFromTaskData(appData *data.AppData) 
+        + Render(data *data.AppData) 
 
     }
     class formData << (S,Aquamarine) >> {
-        - projectId int64
-        - tempStartDate string
-        - tempEndDate string
-        - tempBranch string
-        - task models.Task
-        - branches []models.Branch
+- projectId int64
+- tempStartDate string
+- tempEndDate string
+- tempBranch string
+- task models.Task
+- branches []models.Branch
 
     }
     class taskInformation << (S,Aquamarine) >> {
-        - taskName string
-        - startDateStr string
-        - days int
+- taskName string
+- startDateStr string
+- taskStatus constants.TaskStatus
+- days int
 
     }
     class timelineData << (S,Aquamarine) >> {
-        - startDateStr string
-        - days int
-        - tasks []taskInformation
+- startDateStr string
+- days int
+- tasks []taskInformation
 
-        - getGanttChartImage() : []byte
+        - getGanttChartImage() []byte
 
     }
 }

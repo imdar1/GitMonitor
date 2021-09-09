@@ -6,13 +6,13 @@ participant "BranchModel" as a1
 database "Database" as db
 skinparam backgroundcolor transparent
 
-user -> i1: setDefaultBranch
+user -> i1: Set Default Branch
 activate i1
 
-i1 -> a1: setDefaultBranch
+i1 -> a1: Set Default Branch
 activate a1
 
-a1 -> db: saveDefaultBranch
+a1 -> db: Save Default Branch
 activate db
 
 db --> a1

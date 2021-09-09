@@ -8,12 +8,13 @@ rectangle "GitMonitor" {
     usecase "Atur branch proyek Git" as uc2
     usecase "Atur jadwal proyek" as uc3
     usecase "Lihat timeline proyek\nberdasarkan task" as uc4
-    usecase "Lihat status jadwal proyek" as uc5
+    usecase "Memantau status jadwal proyek" as uc5
     usecase "Lihat informasi proyek\nberdasarkan data Git" as uc6
     usecase "Lihat kontribusi tiap pengembang\npada suatu task" as uc7
     usecase "Lihat daftar pengembang" as uc8
     usecase "Lihat nama proyek" as uc9
     usecase "Lihat daftar commit seiring waktu" as uc10
+    usecase "Memantau status task\npada jadwal proyek" as uc11
 } 
 
 u --> uc1
@@ -23,6 +24,7 @@ u --> uc6
 
 uc3 <.. uc4 : <<extend>>
 uc3 <.. uc5 : <<extend>>
+uc3 <.. uc11 : <<extend>>
 
 uc6 ..> uc7 : <<include>> 
 uc6 ..> uc8 : <<include>>

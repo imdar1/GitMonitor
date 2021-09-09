@@ -4,26 +4,45 @@ actor User as user
 participant "ProfileUI" as a3
 participant "ProfileState" as a1
 participant "GitConfig" as a2
+participant "Git" as g1
+participant "ProjectModel" as p1
 database "Database" as db
 skinparam backgroundcolor transparent
 
-user -> a3: loadProject
+user -> a3: Load project
 activate a3
 
-a3 -> a1: setDirectory
+a3 -> a1: Set directory
 activate a1
 
-a1 -> a2: verifyDirectory
+a1 -> a2: Verify directory
 activate a2
 
+a2 -> g1: Cek direktori
+activate g1
+
+g1 --> a2
+deactivate g1
+
 alt valid directory
-    a2 -> a2: syncWithRemote
+    a2 -> a2: Sync with remote
     activate a2
+    a2 -> g1: Fetch remote
+    activate g1
+    g1 --> a2
+    deactivate g1
     deactivate a2
-    a2 -> db: saveDirectory
+    
+    a2 -> p1: Save project
+    activate p1
+
+    p1 -> db: Insert/update project
     activate db
-    db --> a2
+    db -->p1
     deactivate db
+
+    p1 --> a2
+    deactivate p1
     a2 --> a1: Directory OK
     a1 --> a3: Directory Accepted
     a3 --> user: OK

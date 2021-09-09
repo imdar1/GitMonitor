@@ -12,6 +12,11 @@ namespace data {
         + Database *db.DBConfig
         + SelectedProject models.Project
     }
+
+    interface "**<<interface>>**\nRenderer"  {
+        + Render(data *AppData)
+        --
+    }
 }
 
 @enduml

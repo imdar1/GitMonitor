@@ -1,19 +1,19 @@
 @startuml sequence_diagram4
 skinparam monochrome true
 actor User as user
-participant "TaskUI" as a1
+participant "GeneralUI" as a1
 participant "TaskModel" as a2
 participant "ProjectModel" as a3
 database "Database" as db
 skinparam backgroundcolor transparent
 
-user -> a1: viewProjectScheduleStatus
+user -> a1: Get Project Schedule Status
 activate a1
 
-a1 -> a2: getTask
+a1 -> a2: Get Task
 activate a2
 
-a2 -> db: getTask
+a2 -> db: Get Task
 activate db
 
 db --> a2
@@ -22,10 +22,10 @@ deactivate db
 a2 --> a1
 deactivate a2
 
-a1 --> a3: getProject
+a1 --> a3: Get Project
 activate a3
 
-a3 --> db: getProject
+a3 --> db: Get Project
 activate db
 
 db --> a3

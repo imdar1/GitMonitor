@@ -1,25 +1,32 @@
 @startuml sequence_diagram5
 skinparam monochrome true
 actor User as user
-participant "ProjectUI" as i1
+participant "GeneralUI" as i1
 participant "GitConfig" as a1
+participant "Git" as g1
 participant "TaskModel" as a2
 database "Database" as db
 skinparam backgroundcolor transparent
 
-user -> i1: viewProjectInformation
+user -> i1: View General Information
 activate i1
 
-i1 -> a1: getProjectInformation
+i1 -> a1: Get Project Information
 activate a1
+
+a1 -> g1: Operasi Git
+activate g1
+
+g1 --> a1
+deactivate g1
 
 a1 --> i1
 deactivate a1
 
-i1 -> a2: getProjectTasks
+i1 -> a2: Get Project Tasks
 activate a2
 
-a2 -> db: getTasks
+a2 -> db: Get Tasks
 activate db
 
 db --> a2

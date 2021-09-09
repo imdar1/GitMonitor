@@ -9,6 +9,10 @@ hide circle
 namespace settings {
     class SettingsData << (S,Aquamarine) >> {
         + RemoteBranches []models.Branch
+        + AdditionalRenderers []data.Renderer
+        + Wrapper fyne.CanvasObject
+
+        + Render(data *data.AppData) 
 
     }
 }

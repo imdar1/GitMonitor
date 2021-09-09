@@ -7,26 +7,26 @@ participant "BranchModel" as a2
 database "Database" as db
 skinparam backgroundcolor transparent
 
-user -> i1: setProjectTasks
+user -> i1: Set Project Tasks
 activate i1
 
-i1 -> a1: setProjectTasks
+i1 -> a1: Set Project Tasks
 activate a1
 
-a1 -> a2: verifyTaskBranch
+a1 -> a2: Verify Task Branch
 activate a2
-a2 -> db: getRemoteBranch
+a2 -> db: Get Remote Branch
 activate db
 db --> a2
 deactivate db
 a2 --> a1
 deactivate a2
 
-alt invalid branch
-    a1 --> i1: Invalid branch
-    i1 --> user: Error
-else valid branch
-    a1 -> db: saveTask
+alt invalid input
+    a1 --> i1: Invalid input
+    i1 --> user: Error input invalid
+else valid input
+    a1 -> db: Save Task
     activate db
     db --> a1
     deactivate db

@@ -3,10 +3,11 @@ skinparam monochrome true
 actor User as user
 participant "TaskUI" as a1
 participant "TaskModel" as a2
+participant "BranchModel" as b1
 database "Database" as db
 skinparam backgroundcolor transparent
 
-user -> a1: View Timeline
+user -> a1: Get Task Status
 activate a1
 
 a1 -> a2: Get Task
@@ -20,6 +21,34 @@ deactivate db
 
 a2 --> a1
 deactivate a2
+
+a1 -> b1: Get Remote Branch
+activate b1
+
+b1 -> db: Get Branch
+activate db
+
+db --> b1
+deactivate db
+
+b1 --> a1
+deactivate b1
+
+a1 -> a1: Update
+activate a1
+
+a1 -> a2: Update task status
+activate a2
+
+a2 -> db: Update task
+activate db
+
+db --> a2
+deactivate db
+
+a2 --> a1
+deactivate a2
+deactivate a1
 
 a1 --> user
 deactivate a1

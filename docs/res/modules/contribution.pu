@@ -7,34 +7,39 @@ skinparam monochrome true
 hide circle
 
 namespace contribution {
-    class Author << (S,Aquamarine) >> {
-        + Name string
-        + Email string
+    class author << (S,Aquamarine) >> {
++ Name string
++ Email string
 
     }
-    class AuthorInfo << (S,Aquamarine) >> {
-        + TotalCommit int
-        + LastCommit time.Time
-        + FirstCommit time.Time
+    class authorInfo << (S,Aquamarine) >> {
++ TotalCommit int
++ LastCommit time.Time
++ FirstCommit time.Time
 
     }
     class ContributorData << (S,Aquamarine) >> {
-        - authorMap <font color=blue>map</font>[Author]AuthorInfo
-        - tasks []models.Task
-        - defaultBranchName string
-        - defaultRemoteName string
+- tasks []models.Task
+- authorMap <font color=blue>map</font>[Author]AuthorInfo
+- defaultBranchName string
+- defaultRemoteName string
+
+        + Wrapper fyne.CanvasObject
+
+        + Render(appData *data.AppData) 
+        + SetTasks(tasks []models.Task) 
 
     }
     class authorTable << (S,Aquamarine) >> {
-        - author Author
-        - authorInfo AuthorInfo
+- author Author
+- authorInfo AuthorInfo
 
     }
 }
 
-"contribution.ContributorData" o-- "contribution.Author"
-"contribution.ContributorData" o-- "contribution.AuthorInfo" 
-"contribution.authorTable" o-- "contribution.Author"
-"contribution.authorTable" o-- "contribution.AuthorInfo"
+"contribution.ContributorData" o-- "contribution.author"
+"contribution.ContributorData" o-- "contribution.authorInfo" 
+"contribution.authorTable" o-- "contribution.author"
+"contribution.authorTable" o-- "contribution.authorInfo"
 
 @enduml
