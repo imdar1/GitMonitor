@@ -11,12 +11,12 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
-type Author struct {
+type author struct {
 	Name  string
 	Email string
 }
 
-type AuthorInfo struct {
+type authorInfo struct {
 	TotalCommit int
 	// TotalAddLines int
 	// TotalDelLines int
@@ -28,7 +28,7 @@ type ContributorData struct {
 	Wrapper fyne.CanvasObject
 
 	tasks             []models.Task
-	authorMap         map[Author]AuthorInfo
+	authorMap         map[author]authorInfo
 	defaultBranchName string
 	defaultRemoteName string
 }
@@ -41,10 +41,10 @@ func (data *ContributorData) SetTasks(tasks []models.Task) {
 	data.tasks = getInProgressTask(tasks)
 }
 
-func getAuthorInfoByAuthor(commits []*object.Commit) (map[Author]AuthorInfo, error) {
-	authorInfoMap := make(map[Author]AuthorInfo)
+func getAuthorInfoByAuthor(commits []*object.Commit) (map[author]authorInfo, error) {
+	authorInfoMap := make(map[author]authorInfo)
 	for _, c := range commits {
-		currAuthor := Author{
+		currAuthor := author{
 			Name:  c.Author.Name,
 			Email: c.Author.Email,
 		}
@@ -62,14 +62,14 @@ func getAuthorInfoByAuthor(commits []*object.Commit) (map[Author]AuthorInfo, err
 		// 	currDeletion += val.Deletion
 		// }
 
-		if authorInfo, ok := authorInfoMap[currAuthor]; ok {
-			authorInfo.FirstCommit = c.Author.When
-			authorInfo.TotalCommit++
+		if authorInfoData, ok := authorInfoMap[currAuthor]; ok {
+			authorInfoData.FirstCommit = c.Author.When
+			authorInfoData.TotalCommit++
 			// authorInfo.TotalAddLines += currAddition
 			// authorInfo.TotalDelLines += currDeletion
-			authorInfoMap[currAuthor] = authorInfo
+			authorInfoMap[currAuthor] = authorInfoData
 		} else {
-			authorInfo := AuthorInfo{
+			authorInfo := authorInfo{
 				TotalCommit: 1,
 				// TotalAddLines: currAddition,
 				// TotalDelLines: currDeletion,

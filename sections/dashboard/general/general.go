@@ -33,7 +33,7 @@ func renderGeneralTab(data GeneralData) {
 	dayDiff := utils.GetDayDifference(startDate, endDate)
 	avgCommits := float32(len(data.Commits)) / float32(dayDiff)
 
-	go getLinesOfCodeInformation(data.FileInformation, []string{data.ProjectDir})
+	go getLinesOfCodeInformation(data.fileInformation, []string{data.ProjectDir})
 
 	// create components to render
 	projectNameLabel := widget.NewLabel(data.ProjectName)

@@ -13,8 +13,8 @@ import (
 )
 
 type authorTable struct {
-	author     Author
-	authorInfo AuthorInfo
+	author     author
+	authorInfo authorInfo
 }
 
 func fillCommitString(

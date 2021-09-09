@@ -16,7 +16,7 @@ import (
 	"github.com/hhatto/gocloc"
 )
 
-type FileInformation struct {
+type fileInformation struct {
 	TotalFiles    binding.String
 	TotalCode     binding.String
 	TotalComments binding.String
@@ -24,7 +24,7 @@ type FileInformation struct {
 }
 
 type GeneralData struct {
-	FileInformation
+	fileInformation
 	ProjectDir        string
 	OriginUrl         string
 	ProjectName       string
@@ -93,7 +93,7 @@ func (data *GeneralData) UpdateProjectEndDate(appData *data.AppData) {
 	}
 }
 
-func getLinesOfCodeInformation(fileInformation FileInformation, paths []string) {
+func getLinesOfCodeInformation(fileInformation fileInformation, paths []string) {
 	languages := gocloc.NewDefinedLanguages()
 	options := gocloc.NewClocOptions()
 
@@ -135,7 +135,7 @@ func InitGeneralData(wrapper fyne.CanvasObject, tasks []models.Task, appData *da
 	data.UpdateProjectTaskStatus(appData)
 
 	data.ProjectDir = appData.SelectedProject.ProjectDir
-	data.FileInformation = FileInformation{
+	data.fileInformation = fileInformation{
 		TotalFiles:    binding.NewString(),
 		TotalCode:     binding.NewString(),
 		TotalComments: binding.NewString(),
