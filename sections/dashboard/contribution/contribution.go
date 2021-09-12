@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"gitmonitor/sections/data"
 	"gitmonitor/services/utils"
-	"sync"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -42,6 +41,9 @@ func fillCommitString(
 			baseCommit = commits[index+1]
 		}
 		stats, err := appData.Repo.GetDiff(commit, baseCommit)
+		stats2, err := commit.Stats()
+		fmt.Println(stats2.String())
+		fmt.Println(stats.String())
 
 		commitsString = fmt.Sprintf("%s%s\n", commitsString, commit.String())
 		utils.CheckErr("getFeatureBranchesListCanvas", err)
@@ -106,8 +108,8 @@ func getFeatureBranchesListCanvas(data ContributorData, appData *data.AppData) f
 	}
 
 	featureContent := container.NewHSplit(
-		container.NewVScroll(taskList),
-		container.NewVScroll(taskDetailCard),
+		container.NewScroll(taskList),
+		container.NewScroll(taskDetailCard),
 	)
 
 	return featureContent
@@ -119,11 +121,10 @@ func renderContributorTab(data ContributorData, appData *data.AppData) {
 		authorList = append(authorList, authorTable{key, value})
 	}
 
-	minLabelWidth := []float32{0, 0, 0, 0, 0}
-	var mu = &sync.Mutex{}
+	// TODO: Change this hardcoded size into the real min width after the race condition mitigated
+	minLabelWidth := []float32{208, 373, 80, 171, 163}
 
-	var table *widget.Table
-	table = widget.NewTable(
+	table := widget.NewTable(
 		func() (int, int) {
 			return len(data.authorMap) + 1, 5
 		},
@@ -166,17 +167,11 @@ func renderContributorTab(data ContributorData, appData *data.AppData) {
 					label.SetText(" ")
 				}
 			}
-			if minLabelWidth[id.Col] < label.MinSize().Width {
-				mu.Lock()
-				minLabelWidth[id.Col] = label.MinSize().Width
-				go func(id int) {
-					table.SetColumnWidth(id, minLabelWidth[id])
-					table.Refresh()
-				}(id.Col)
-				mu.Unlock()
-			}
 		},
 	)
+	for i, width := range minLabelWidth {
+		table.SetColumnWidth(i, width)
+	}
 
 	featureContent := getFeatureBranchesListCanvas(data, appData)
 	contributorContent := container.NewVSplit(featureContent, table)
