@@ -41,9 +41,6 @@ func fillCommitString(
 			baseCommit = commits[index+1]
 		}
 		stats, err := appData.Repo.GetDiff(commit, baseCommit)
-		stats2, err := commit.Stats()
-		fmt.Println(stats2.String())
-		fmt.Println(stats.String())
 
 		commitsString = fmt.Sprintf("%s%s\n", commitsString, commit.String())
 		utils.CheckErr("getFeatureBranchesListCanvas", err)
