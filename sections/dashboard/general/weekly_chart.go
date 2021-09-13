@@ -16,41 +16,48 @@ import (
 func getCommitsCountByWeeks(commits []*object.Commit, weeks int) []int {
 	commitsCount := []int{}
 
-	// get the beginning of current date
+	// get the beginning time of current date
 	now := time.Now()
 	beginningOfDay := utils.BeginningOfDay(now)
+
+	// reduce weeks by 1 because the count will start from weeks-1..0
+	totalBars := weeks
+	weeks--
 
 	// get the beginning of the current week
 	beginningOfWeek := beginningOfDay.AddDate(0, 0, -7)
 	for _, v := range commits {
-		if weeks <= 0 {
+		if weeks < 0 {
 			break
 		}
 
-		if v.Author.When.After(beginningOfWeek) {
+		if v.Committer.When.After(beginningOfWeek) {
 			if len(commitsCount) == 0 {
 				commitsCount = append(commitsCount, 1)
 			} else {
-				commitsCount[len(commitsCount)-1] += 1
+				commitsCount[len(commitsCount)-1]++
 			}
 		} else {
-			for v.Author.When.Before(beginningOfWeek) && weeks > 0 {
-				commitsCount = append(commitsCount, 0)
-				weeks -= 1
+			// Decrease beginning of week by 7 days until reach the current commit-week
+			for v.Committer.When.Before(beginningOfWeek) {
+				// Append only if the current week is not the latest of the total weeks
+				if weeks > 0 {
+					commitsCount = append(commitsCount, 0)
+				}
+				weeks--
 				beginningOfWeek = beginningOfWeek.AddDate(0, 0, -7)
 			}
-			if weeks > 0 {
-				commitsCount = append(commitsCount, 1)
+			if weeks >= 0 {
+				commitsCount[len(commitsCount)-1]++
 			}
-			weeks -= 1
 		}
 	}
-	commitsCount = fillWithZerosNTimes(commitsCount, 10, 10)
+	commitsCount = fillWithZerosNTimes(commitsCount, totalBars, totalBars)
 	return commitsCount
 }
 
 func getWeeklyChart(commits []*object.Commit) image.Image {
-	last10WeeksCommitsCount := getCommitsCountByWeeks(commits, 9)
+	last10WeeksCommitsCount := getCommitsCountByWeeks(commits, 10)
 	chartValue, maxVal := toChartValueAndGetMax(last10WeeksCommitsCount, 7, 7)
 	// prevent runtime error whenever each element is 0
 	maxVal += 1
